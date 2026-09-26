@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Grey PC Simulator</title>
-<!-- Local favicon -->
 <link rel="icon" type="image/png" href="logo.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -29,6 +28,7 @@
   --md-shadow: rgba(0,0,0,.15);
   --spring: cubic-bezier(.34,1.56,.64,1);
   --smooth: cubic-bezier(.2,0,0,1);
+  --ease-out-expo: cubic-bezier(.16,1,.3,1);
   --nav-height: 64px;
 }
 
@@ -69,7 +69,7 @@ body {
 }
 
 /* ------------------------------------------------------------------ *
- * LIVING BACKGROUND (Blobs only)
+ * LIVING BACKGROUND (Animated Blobs)
  * ------------------------------------------------------------------ */
 .bg-blobs {
   position: fixed;
@@ -84,19 +84,21 @@ body {
   border-radius: 50%;
   filter: blur(100px);
   opacity: 0.35;
-  will-change: transform, left, top;
-  animation: float 25s infinite ease-in-out;
+  will-change: transform, left, top, background;
+  animation:
+    float 25s infinite ease-in-out,
+    hueShift 18s infinite ease-in-out;
+  transition: background 1.5s var(--smooth);
 }
 
-/* Blob positions and colors */
 .blob-1 {
   background: var(--md-primary);
   width: 45vw;
   height: 45vw;
   top: -10%;
   left: -10%;
-  animation-delay: 0s;
-  animation-duration: 22s;
+  animation-delay: 0s, 0s;
+  animation-duration: 22s, 18s;
 }
 .blob-2 {
   background: var(--md-tertiary);
@@ -104,8 +106,8 @@ body {
   height: 40vw;
   bottom: -15%;
   right: -10%;
-  animation-delay: -6s;
-  animation-duration: 28s;
+  animation-delay: -6s, -4s;
+  animation-duration: 28s, 22s;
 }
 .blob-3 {
   background: #6750A4;
@@ -113,8 +115,8 @@ body {
   height: 35vw;
   top: 30%;
   left: 40%;
-  animation-delay: -12s;
-  animation-duration: 26s;
+  animation-delay: -12s, -8s;
+  animation-duration: 26s, 20s;
 }
 .blob-4 {
   background: #7D5260;
@@ -122,8 +124,8 @@ body {
   height: 30vw;
   top: 5%;
   right: 15%;
-  animation-delay: -18s;
-  animation-duration: 24s;
+  animation-delay: -18s, -12s;
+  animation-duration: 24s, 24s;
 }
 
 @keyframes float {
@@ -131,6 +133,11 @@ body {
   33%  { left: 4%; top: -6%; }
   66%  { left: -3%; top: 5%; }
   100% { left: 0; top: 0; }
+}
+
+@keyframes hueShift {
+  0%, 100% { filter: blur(100px) hue-rotate(0deg); }
+  50%      { filter: blur(100px) hue-rotate(35deg); }
 }
 
 /* ------------------------------------------------------------------ *
@@ -156,7 +163,11 @@ nav {
   border-bottom: 1px solid var(--md-outline-variant);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  transition: padding-right .2s ease;
+  transition: padding-right .2s ease, box-shadow .3s ease;
+}
+
+nav.scrolled {
+  box-shadow: 0 4px 24px var(--md-shadow);
 }
 
 .nav-logo {
@@ -170,6 +181,11 @@ nav {
   font-variation-settings: 'wdth' 110;
   white-space: nowrap;
   text-decoration: none;
+  transition: transform .35s var(--spring);
+}
+
+.nav-logo:hover {
+  transform: scale(1.04);
 }
 
 .nav-logo img {
@@ -178,6 +194,19 @@ nav {
   border-radius: 8px;
   object-fit: cover;
   display: block;
+  transition: transform .5s var(--spring), box-shadow .4s var(--smooth);
+  animation: logoPulse 4s ease-in-out infinite;
+}
+
+.nav-logo:hover img {
+  transform: rotate(-6deg) scale(1.1);
+  box-shadow: 0 4px 16px color-mix(in srgb, var(--md-primary) 40%, transparent);
+  animation-play-state: paused;
+}
+
+@keyframes logoPulse {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-primary) 30%, transparent); }
+  50%      { box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 0%, transparent); }
 }
 
 @media (max-width: 480px) {
@@ -194,21 +223,44 @@ nav {
 }
 
 .nav-link {
+  position: relative;
   padding: 8px 16px;
   border-radius: 50px;
   font-size: 14px;
   font-weight: 500;
   color: var(--md-on-surface-variant);
   text-decoration: none;
-  transition: background .2s var(--smooth), color .2s;
+  transition: background .3s var(--smooth), color .3s var(--smooth);
   white-space: nowrap;
+  overflow: hidden;
+}
+
+.nav-link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: color-mix(in srgb, var(--md-primary) 10%, transparent);
+  transform: scale(.6);
+  opacity: 0;
+  transition: transform .35s var(--spring), opacity .25s var(--smooth);
+}
+
+.nav-link:hover::before,
+.nav-link:focus-visible::before {
+  transform: scale(1);
+  opacity: 1;
 }
 
 .nav-link:hover,
 .nav-link:focus-visible {
-  background: color-mix(in srgb, var(--md-primary) 10%, transparent);
   color: var(--md-primary);
   outline: none;
+}
+
+.nav-link span {
+  position: relative;
+  z-index: 1;
 }
 
 @media (max-width: 480px) {
@@ -239,9 +291,10 @@ nav {
   justify-content: center;
   text-align: center;
   padding: 100px 24px 80px;
-  background: transparent; 
+  background: transparent;
   position: relative;
   z-index: 1;
+  will-change: transform, opacity;
 }
 
 @media (max-width: 600px) {
@@ -264,7 +317,12 @@ nav {
   letter-spacing: .5px;
   text-transform: uppercase;
   margin-bottom: 24px;
-  animation: popIn .6s var(--spring) both;
+  animation: popIn .8s var(--spring) both, eyebrowGlow 3s ease-in-out infinite 1s;
+}
+
+@keyframes eyebrowGlow {
+  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-primary) 25%, transparent); }
+  50%      { box-shadow: 0 0 0 8px color-mix(in srgb, var(--md-primary) 0%, transparent); }
 }
 
 .hero-title {
@@ -274,11 +332,50 @@ nav {
   letter-spacing: -2px;
   font-variation-settings: 'wdth' 130;
   max-width: 900px;
-  animation: slideUp .7s var(--spring) .1s both;
+}
+
+.hero-title .line {
+  display: block;
+  overflow: hidden;
+}
+
+.hero-title .word {
+  display: inline-block;
+  animation: wordReveal .9s var(--ease-out-expo) both;
+}
+
+.hero-title .line:nth-child(1) .word:nth-child(1) { animation-delay: .15s; }
+.hero-title .line:nth-child(1) .word:nth-child(2) { animation-delay: .25s; }
+.hero-title .line:nth-child(2) .word:nth-child(1) { animation-delay: .35s; }
+.hero-title .line:nth-child(2) .word:nth-child(2) { animation-delay: .45s; }
+
+@keyframes wordReveal {
+  from {
+    opacity: 0;
+    transform: translateY(100%) rotate(6deg);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) rotate(0);
+  }
 }
 
 .hero-title .accent {
   color: var(--md-primary);
+  background: linear-gradient(120deg,
+    var(--md-primary) 0%,
+    var(--md-tertiary) 50%,
+    var(--md-primary) 100%);
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradientFlow 6s linear infinite;
+}
+
+@keyframes gradientFlow {
+  0%   { background-position: 0% center; }
+  100% { background-position: 200% center; }
 }
 
 .hero-sub {
@@ -287,7 +384,7 @@ nav {
   color: var(--md-on-surface-variant);
   max-width: 560px;
   line-height: 1.6;
-  animation: slideUp .7s var(--spring) .2s both;
+  animation: slideUp .9s var(--ease-out-expo) .5s both;
 }
 
 .hero-actions {
@@ -296,7 +393,7 @@ nav {
   gap: 12px;
   flex-wrap: wrap;
   justify-content: center;
-  animation: slideUp .7s var(--spring) .3s both;
+  animation: slideUp .9s var(--ease-out-expo) .65s both;
 }
 
 .btn {
@@ -312,12 +409,34 @@ nav {
   text-decoration: none;
   border-radius: 50px;
   transition:
-    border-radius .35s var(--spring),
-    transform .25s var(--spring),
-    box-shadow .2s var(--smooth),
-    background .2s;
+    border-radius .5s var(--spring),
+    transform .35s var(--spring),
+    box-shadow .35s var(--smooth),
+    background .3s var(--smooth);
   position: relative;
   overflow: hidden;
+  isolation: isolate;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -120%;
+  width: 80%;
+  height: 100%;
+  background: linear-gradient(115deg,
+    transparent 0%,
+    rgba(255,255,255,.4) 50%,
+    transparent 100%);
+  transform: skewX(-20deg);
+  transition: left .7s var(--ease-out-expo);
+  z-index: 2;
+  pointer-events: none;
+}
+
+.btn:hover::before {
+  left: 130%;
 }
 
 .btn::after {
@@ -327,16 +446,22 @@ nav {
   background: currentColor;
   opacity: 0;
   border-radius: inherit;
-  transition: opacity .2s;
+  transition: opacity .25s;
   pointer-events: none;
+  z-index: 1;
 }
 
 .btn:hover::after {
   opacity: .08;
 }
 
+.btn > * {
+  position: relative;
+  z-index: 3;
+}
+
 .btn:active {
-  transform: scale(.96);
+  transform: scale(.95);
   border-radius: 16px;
 }
 
@@ -352,8 +477,9 @@ nav {
 }
 
 .btn-filled:hover {
-  box-shadow: 0 6px 20px var(--md-shadow);
+  box-shadow: 0 8px 28px color-mix(in srgb, var(--md-primary) 45%, transparent);
   border-radius: 20px;
+  transform: translateY(-2px);
 }
 
 .btn-tonal {
@@ -363,9 +489,11 @@ nav {
 
 .btn-tonal:hover {
   border-radius: 20px;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px var(--md-shadow);
 }
 
-/* Updated Wave to be transparent so the background shows through */
+/* Wave */
 .wave {
   display: block;
   width: 100%;
@@ -377,6 +505,12 @@ nav {
   fill: color-mix(in srgb, var(--md-primary) 6%, var(--md-surface));
   position: relative;
   z-index: 1;
+  opacity: 0;
+  animation: waveIn 1.2s var(--ease-out-expo) .7s forwards;
+}
+
+@keyframes waveIn {
+  to { opacity: 1; }
 }
 
 section {
@@ -405,11 +539,13 @@ section {
   max-width: 650px;
 }
 
+/* Feature cards with 3D tilt */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   margin-top: 44px;
+  perspective: 1200px;
 }
 
 .feature-card {
@@ -419,13 +555,38 @@ section {
   border-radius: 28px;
   padding: 32px;
   border: 1px solid color-mix(in srgb, var(--md-outline-variant) 50%, transparent);
-  transition: transform .35s var(--spring), box-shadow .25s var(--smooth);
+  transition:
+    transform .5s var(--spring),
+    box-shadow .4s var(--smooth),
+    border-color .4s var(--smooth);
   cursor: default;
+  transform-style: preserve-3d;
+  will-change: transform;
+  position: relative;
+  overflow: hidden;
+}
+
+.feature-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mx, 50%) var(--my, 50%),
+    color-mix(in srgb, var(--md-primary) 18%, transparent) 0%,
+    transparent 60%);
+  opacity: 0;
+  transition: opacity .4s var(--smooth);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+.feature-card:hover::before {
+  opacity: 1;
 }
 
 .feature-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  box-shadow: 0 12px 32px var(--md-shadow);
+  box-shadow: 0 20px 48px var(--md-shadow);
+  border-color: color-mix(in srgb, var(--md-primary) 40%, transparent);
 }
 
 .feature-icon {
@@ -439,11 +600,20 @@ section {
   justify-content: center;
   font-size: 28px;
   margin-bottom: 20px;
-  transition: border-radius .35s var(--spring);
+  transition: border-radius .5s var(--spring), transform .5s var(--spring);
 }
 
 .feature-card:hover .feature-icon {
   border-radius: 28px;
+  transform: scale(1.1) rotate(-6deg);
+}
+
+.feature-icon .material-symbols-rounded {
+  transition: transform .5s var(--spring);
+}
+
+.feature-card:hover .feature-icon .material-symbols-rounded {
+  transform: rotate(6deg);
 }
 
 .feature-card h3 {
@@ -459,6 +629,7 @@ section {
   color: var(--md-on-surface-variant);
 }
 
+/* Multiplayer */
 .multi-section {
   background: color-mix(in srgb, var(--md-primary) 6%, var(--md-surface));
   backdrop-filter: blur(8px);
@@ -491,17 +662,25 @@ section {
   background: linear-gradient(135deg,
       color-mix(in srgb, var(--md-primary) 30%, transparent),
       color-mix(in srgb, var(--md-tertiary) 30%, transparent));
+  background-size: 200% 200%;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 80px;
   box-shadow: 0 16px 48px var(--md-shadow);
-  transition: border-radius .4s var(--spring);
+  transition: border-radius .6s var(--spring), transform .6s var(--spring);
   user-select: none;
+  animation: gradientShift 8s ease-in-out infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% { background-position: 0% 50%; }
+  50%      { background-position: 100% 50%; }
 }
 
 .multi-visual:hover {
   border-radius: 20px;
+  transform: rotate(-2deg) scale(1.03);
 }
 
 .multi-points {
@@ -515,6 +694,11 @@ section {
   display: flex;
   align-items: flex-start;
   gap: 16px;
+  transition: transform .4s var(--spring);
+}
+
+.point:hover {
+  transform: translateX(6px);
 }
 
 .point-dot {
@@ -524,6 +708,12 @@ section {
   background: var(--md-primary);
   margin-top: 6px;
   flex-shrink: 0;
+  transition: transform .4s var(--spring), box-shadow .4s var(--smooth);
+}
+
+.point:hover .point-dot {
+  transform: scale(1.4);
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 20%, transparent);
 }
 
 .point p {
@@ -536,6 +726,7 @@ section {
   color: var(--md-on-surface);
 }
 
+/* Chips */
 .saves-chips {
   display: flex;
   flex-wrap: wrap;
@@ -556,16 +747,23 @@ section {
   font-weight: 500;
   line-height: 1.2;
   color: var(--md-on-surface-variant);
-  transition: all .25s var(--spring);
+  transition: all .4s var(--spring);
   cursor: pointer;
   backdrop-filter: blur(4px);
+  position: relative;
+  overflow: hidden;
 }
 
 .chip:hover {
   border-color: var(--md-primary);
   background: color-mix(in srgb, var(--md-primary) 15%, transparent);
   color: var(--md-primary);
-  transform: scale(1.04);
+  transform: translateY(-3px) scale(1.05);
+  box-shadow: 0 6px 16px var(--md-shadow);
+}
+
+.chip:active {
+  transform: translateY(0) scale(.98);
 }
 
 .chip:focus-visible {
@@ -577,8 +775,24 @@ section {
   background: var(--md-primary);
   color: var(--md-on-primary);
   border-color: var(--md-primary);
+  animation: chipPop .5s var(--spring);
 }
 
+@keyframes chipPop {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.12); }
+  100% { transform: scale(1); }
+}
+
+.chip .material-symbols-rounded {
+  transition: transform .4s var(--spring);
+}
+
+.chip:hover .material-symbols-rounded {
+  transform: rotate(-10deg) scale(1.1);
+}
+
+/* CTA */
 .cta-section {
   text-align: center;
   padding: 100px 24px;
@@ -621,13 +835,25 @@ section {
   font-size: 14px;
   font-weight: 500;
   color: var(--md-on-surface-variant);
+  transition: transform .4s var(--spring), background .3s var(--smooth);
+}
+
+.badge:hover {
+  transform: translateY(-4px);
+  background: color-mix(in srgb, var(--md-primary) 15%, var(--md-surface-variant));
 }
 
 .badge .material-symbols-rounded {
   font-size: 20px;
   color: var(--md-primary);
+  transition: transform .5s var(--spring);
 }
 
+.badge:hover .material-symbols-rounded {
+  transform: rotate(-12deg) scale(1.15);
+}
+
+/* Modal */
 .dl-overlay {
   position: fixed;
   inset: 0;
@@ -642,14 +868,14 @@ section {
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
-  transition: opacity .3s var(--smooth), visibility 0s linear .3s;
+  transition: opacity .4s var(--smooth), visibility 0s linear .4s;
 }
 
 .dl-overlay.open {
   opacity: 1;
   visibility: visible;
   pointer-events: all;
-  transition: opacity .3s var(--smooth), visibility 0s linear 0s;
+  transition: opacity .4s var(--smooth), visibility 0s linear 0s;
 }
 
 .dl-modal {
@@ -660,12 +886,14 @@ section {
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
   box-shadow: 0 24px 64px rgba(0,0,0,.3);
-  transform: scale(.88) translateY(24px);
-  transition: transform .4s var(--spring);
+  transform: scale(.85) translateY(32px) rotate(-1deg);
+  opacity: 0;
+  transition: transform .55s var(--spring), opacity .35s var(--smooth);
 }
 
 .dl-overlay.open .dl-modal {
-  transform: scale(1) translateY(0);
+  transform: scale(1) translateY(0) rotate(0);
+  opacity: 1;
 }
 
 .dl-modal h3 {
@@ -698,15 +926,36 @@ section {
   text-decoration: none;
   color: var(--md-on-surface);
   cursor: pointer;
-  transition: border-color .25s var(--spring), background .25s, transform .3s var(--spring);
+  transition: border-color .35s var(--spring), background .35s var(--smooth), transform .4s var(--spring);
+  position: relative;
+  overflow: hidden;
+}
+
+.dl-option::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--md-primary) 15%, transparent);
+  transform: translate(-50%, -50%);
+  transition: width .6s var(--ease-out-expo), height .6s var(--ease-out-expo);
+  pointer-events: none;
+}
+
+.dl-option:hover::after {
+  width: 500px;
+  height: 500px;
 }
 
 .dl-option:hover,
 .dl-option:focus-visible {
   border-color: var(--md-primary);
-  background: color-mix(in srgb, var(--md-primary) 8%, transparent);
-  transform: scale(1.02);
+  transform: translateY(-3px) scale(1.02);
   outline: none;
+  box-shadow: 0 8px 24px var(--md-shadow);
 }
 
 .dl-option:focus-visible {
@@ -715,7 +964,12 @@ section {
 }
 
 .dl-option:active {
-  transform: scale(.98);
+  transform: translateY(0) scale(.98);
+}
+
+.dl-option > * {
+  position: relative;
+  z-index: 1;
 }
 
 .dl-option-icon {
@@ -725,6 +979,11 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: transform .5s var(--spring);
+}
+
+.dl-option:hover .dl-option-icon {
+  transform: scale(1.1) rotate(-5deg);
 }
 
 .dl-option-icon svg {
@@ -762,12 +1021,13 @@ section {
   font-weight: 500;
   color: var(--md-on-surface-variant);
   cursor: pointer;
-  transition: background .2s;
+  transition: background .3s var(--smooth), color .3s var(--smooth);
 }
 
 .dl-close:hover,
 .dl-close:focus-visible {
   background: var(--md-surface-variant);
+  color: var(--md-on-surface);
   outline: none;
 }
 
@@ -776,6 +1036,7 @@ section {
   outline-offset: 2px;
 }
 
+/* Footer */
 footer {
   border-top: 1px solid var(--md-outline-variant);
   padding: 32px 24px;
@@ -791,10 +1052,26 @@ footer {
 footer a {
   color: var(--md-primary);
   text-decoration: none;
+  position: relative;
+  transition: color .3s var(--smooth);
 }
 
-footer a:hover {
-  text-decoration: underline;
+footer a::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 1.5px;
+  background: var(--md-primary);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform .4s var(--ease-out-expo);
+}
+
+footer a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
 }
 
 .footer-logo {
@@ -804,8 +1081,55 @@ footer a:hover {
   object-fit: cover;
   margin-bottom: 12px;
   display: inline-block;
+  transition: transform .5s var(--spring);
 }
 
+.footer-logo:hover {
+  transform: rotate(8deg) scale(1.1);
+}
+
+/* ------------------------------------------------------------------ *
+ * Reveal animations
+ * ------------------------------------------------------------------ */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity .9s var(--ease-out-expo), transform .9s var(--ease-out-expo);
+  will-change: opacity, transform;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.reveal.reveal-left {
+  transform: translateX(-50px);
+}
+
+.reveal.reveal-left.visible {
+  transform: none;
+}
+
+.reveal.reveal-right {
+  transform: translateX(50px);
+}
+
+.reveal.reveal-right.visible {
+  transform: none;
+}
+
+.reveal.reveal-scale {
+  transform: scale(.9);
+}
+
+.reveal.reveal-scale.visible {
+  transform: none;
+}
+
+/* ------------------------------------------------------------------ *
+ * Keyframes
+ * ------------------------------------------------------------------ */
 @keyframes popIn {
   from { opacity: 0; transform: scale(.7); }
   to   { opacity: 1; transform: scale(1); }
@@ -816,18 +1140,9 @@ footer a:hover {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-.reveal {
-  opacity: 0;
-  transform: translateY(32px);
-  transition: opacity .6s var(--smooth), transform .6s var(--spring);
-  will-change: opacity, transform;
-}
-
-.reveal.visible {
-  opacity: 1;
-  transform: none;
-}
-
+/* ------------------------------------------------------------------ *
+ * Reduced motion
+ * ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -838,6 +1153,7 @@ footer a:hover {
   }
   .reveal { opacity: 1; transform: none; }
   .blob { animation: none; }
+  .hero-title .word { animation: none; }
 }
 </style>
 </head>
@@ -857,19 +1173,20 @@ footer a:hover {
     <span>Grey PC</span>
   </a>
   <div class="nav-links">
-    <a href="#features" class="nav-link">Features</a>
-    <a href="#multiplayer" class="nav-link">Multiplayer</a>
-    <a href="#cta" class="nav-link">Download</a>
+    <a href="#features" class="nav-link"><span>Features</span></a>
+    <a href="#multiplayer" class="nav-link"><span>Multiplayer</span></a>
+    <a href="#cta" class="nav-link"><span>Download</span></a>
   </div>
 </nav>
 
-<section class="hero">
+<section class="hero" id="heroSection">
   <div class="hero-eyebrow">
     <span class="material-symbols-rounded" style="font-size:14px">computer</span>
     PC Simulator
   </div>
   <h1 class="hero-title">
-    Build your<br><span class="accent">perfect PC</span>
+    <span class="line"><span class="word">Build</span> <span class="word">your</span></span>
+    <span class="line"><span class="word accent">perfect</span> <span class="word accent">PC</span></span>
   </h1>
   <p class="hero-sub">
     Build, repair and upgrade virtual computers — solo or with a friend, in real time.
@@ -877,11 +1194,11 @@ footer a:hover {
   <div class="hero-actions">
     <button type="button" onclick="openDownload()" class="btn btn-filled">
       <span class="material-symbols-rounded">download</span>
-      Download for free
+      <span>Download for free</span>
     </button>
     <a href="#features" class="btn btn-tonal">
       <span class="material-symbols-rounded">play_circle</span>
-      Learn more
+      <span>Learn more</span>
     </a>
   </div>
 </section>
@@ -896,42 +1213,42 @@ footer a:hover {
     <h2 class="section-title">Everything a real master needs</h2>
   </div>
   <div class="features-grid">
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">
         <span class="material-symbols-rounded">memory</span>
       </div>
       <h3>Realistic building</h3>
       <p>Install CPUs, graphics cards, RAM and drives into real motherboard slots — with proper compatibility checks.</p>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">
         <span class="material-symbols-rounded">build</span>
       </div>
       <h3>Repair &amp; diagnostics</h3>
       <p>Fix broken PCs, track down faults, replace parts — just like in a real repair shop.</p>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">
         <span class="material-symbols-rounded">storefront</span>
       </div>
       <h3>Daily Market</h3>
       <p>Buy rare components on the daily market and unlock exclusive items with bitcoins.</p>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">
         <span class="material-symbols-rounded">pets</span>
       </div>
       <h3>Secret cat 🐱</h3>
       <p>Find the hidden low-poly cat on every map. You can pick it up and put it on your desk.</p>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">
         <span class="material-symbols-rounded">garage</span>
       </div>
       <h3>Garage &amp; workshop</h3>
       <p>Several unique locations with different equipment and interiors. Unlock new ones as you progress.</p>
     </div>
-    <div class="feature-card reveal">
+    <div class="feature-card reveal" data-tilt>
       <div class="feature-icon">
         <span class="material-symbols-rounded">save</span>
       </div>
@@ -943,8 +1260,8 @@ footer a:hover {
 
 <div class="multi-section" id="multiplayer">
   <div class="multi-inner">
-    <div class="multi-visual reveal" aria-hidden="true">🔗</div>
-    <div class="reveal">
+    <div class="multi-visual reveal reveal-left" aria-hidden="true">🔗</div>
+    <div class="reveal reveal-right">
       <div class="section-label">Multiplayer</div>
       <h2 class="section-title">Build together</h2>
       <div class="multi-points">
@@ -966,7 +1283,9 @@ footer a:hover {
         </div>
       </div>
       <div style="margin-top:32px;">
-        <a href="#cta" class="btn btn-filled">Try it with a friend</a>
+        <a href="#cta" class="btn btn-filled">
+          <span>Try it with a friend</span>
+        </a>
       </div>
     </div>
   </div>
@@ -1000,17 +1319,17 @@ footer a:hover {
 </section>
 
 <section class="cta-section" id="cta">
-  <div class="reveal">
+  <div class="reveal reveal-scale">
     <h2 class="cta-title">Ready to start building?</h2>
     <p class="cta-sub">Download Grey PC Simulator for free</p>
     <div class="hero-actions">
       <button type="button" onclick="openDownload()" class="btn btn-filled">
         <span class="material-symbols-rounded">download</span>
-        Download for free
+        <span>Download for free</span>
       </button>
       <a href="https://discord.gg" target="_blank" rel="noopener" class="btn btn-tonal">
         <span class="material-symbols-rounded">forum</span>
-        Community
+        <span>Community</span>
       </a>
     </div>
     <div class="platform-badges">
@@ -1079,18 +1398,44 @@ footer a:hover {
 /* ================================================================== *
  * LIVING BACKGROUND - Mouse Parallax for Blobs
  * ================================================================== */
+let mouseX = 0, mouseY = 0;
+let blobX = 0, blobY = 0;
+const blobs = document.querySelectorAll('.blob');
 
-// Mouse Parallax for Blobs
 document.addEventListener('mousemove', (e) => {
-  const x = (e.clientX / window.innerWidth - 0.5) * 2;
-  const y = (e.clientY / window.innerHeight - 0.5) * 2;
-
-  const blobs = document.querySelectorAll('.blob');
-  blobs.forEach((blob, index) => {
-    const speed = (index + 1) * 12; // Different depths
-    blob.style.transform = `translate(${x * speed}px, ${y * speed}px)`;
-  });
+  mouseX = (e.clientX / window.innerWidth - 0.5) * 2;
+  mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
 });
+
+// Smooth blob parallax with requestAnimationFrame
+function animateBlobs() {
+  blobX += (mouseX - blobX) * 0.05;
+  blobY += (mouseY - blobY) * 0.05;
+
+  blobs.forEach((blob, index) => {
+    const speed = (index + 1) * 12;
+    blob.style.transform = `translate(${blobX * speed}px, ${blobY * speed}px)`;
+  });
+
+  requestAnimationFrame(animateBlobs);
+}
+animateBlobs();
+
+/* ================================================================== *
+ * NAV scroll state
+ * ================================================================== */
+const nav = document.querySelector('nav');
+let lastScroll = 0;
+
+window.addEventListener('scroll', () => {
+  const y = window.scrollY;
+  if (y > 20) {
+    nav.classList.add('scrolled');
+  } else {
+    nav.classList.remove('scrolled');
+  }
+  lastScroll = y;
+}, { passive: true });
 
 /* ================================================================== *
  * Scroll reveal
@@ -1103,29 +1448,119 @@ const revealObserver = new IntersectionObserver((entries, obs) => {
     revealElement(entry.target);
     obs.unobserve(entry.target);
   });
-}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+}, { threshold: 0.12, rootMargin: '0px 0px -60px 0px' });
 
 function revealElement(el) {
   if (el.classList.contains('visible')) return;
   el.classList.add('visible');
 
+  // Clear stagger delay after reveal completes
   const delay = parseFloat(el.style.transitionDelay) || 0;
-  window.setTimeout(() => { el.style.transitionDelay = ''; }, (delay + 0.8) * 1000);
+  window.setTimeout(() => { el.style.transitionDelay = ''; }, (delay + 1) * 1000);
 }
 
+// Stagger feature cards
 document.querySelectorAll('.feature-card').forEach((el, i) => {
-  el.style.transitionDelay = (i * 0.07) + 's';
+  el.style.transitionDelay = (i * 0.08) + 's';
+});
+
+// Stagger chips
+document.querySelectorAll('.saves-chips .chip').forEach((el, i) => {
+  el.style.transitionDelay = (i * 0.06) + 's';
 });
 
 function initScrollReveal() {
   revealElements.forEach(el => {
     const rect = el.getBoundingClientRect();
-    if (rect.top < window.innerHeight && rect.bottom > 0) {
+    if (rect.top < window.innerHeight * 0.95 && rect.bottom > 0) {
       revealElement(el);
     } else {
       revealObserver.observe(el);
     }
   });
+}
+
+/* ================================================================== *
+ * 3D TILT on feature cards
+ * ================================================================== */
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+if (!prefersReducedMotion) {
+  document.querySelectorAll('[data-tilt]').forEach(card => {
+    let rafId = null;
+    let targetRX = 0, targetRY = 0, targetMX = 50, targetMY = 50;
+    let currentRX = 0, currentRY = 0, currentMX = 50, currentMY = 50;
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const x = (e.clientX - rect.left) / rect.width;
+      const y = (e.clientY - rect.top) / rect.height;
+
+      targetRX = (0.5 - y) * 8;
+      targetRY = (x - 0.5) * 8;
+      targetMX = x * 100;
+      targetMY = y * 100;
+
+      if (!rafId) rafId = requestAnimationFrame(updateTilt);
+    });
+
+    card.addEventListener('mouseleave', () => {
+      targetRX = 0;
+      targetRY = 0;
+      targetMX = 50;
+      targetMY = 50;
+      if (!rafId) rafId = requestAnimationFrame(updateTilt);
+    });
+
+    function updateTilt() {
+      // Smooth spring-like interpolation
+      currentRX += (targetRX - currentRX) * 0.12;
+      currentRY += (targetRY - currentRY) * 0.12;
+      currentMX += (targetMX - currentMX) * 0.12;
+      currentMY += (targetMY - currentMY) * 0.12;
+
+      card.style.transform = `perspective(1000px) rotateX(${currentRX}deg) rotateY(${currentRY}deg) translateY(-6px) scale(1.02)`;
+      card.style.setProperty('--mx', currentMX + '%');
+      card.style.setProperty('--my', currentMY + '%');
+
+      const stillMoving =
+        Math.abs(targetRX - currentRX) > 0.05 ||
+        Math.abs(targetRY - currentRY) > 0.05 ||
+        Math.abs(targetMX - currentMX) > 0.2 ||
+        Math.abs(targetMY - currentMY) > 0.2;
+
+      if (stillMoving) {
+        rafId = requestAnimationFrame(updateTilt);
+      } else {
+        rafId = null;
+        if (targetRX === 0 && targetRY === 0) {
+          card.style.transform = '';
+        }
+      }
+    }
+  });
+}
+
+/* ================================================================== *
+ * HERO parallax on scroll
+ * ================================================================== */
+const hero = document.querySelector('.hero');
+if (hero && !prefersReducedMotion) {
+  let heroTicking = false;
+  window.addEventListener('scroll', () => {
+    if (heroTicking) return;
+    heroTicking = true;
+    requestAnimationFrame(() => {
+      const y = window.scrollY;
+      const limit = window.innerHeight * 0.6;
+      if (y < limit) {
+        const p = y / limit;
+        hero.style.transform = `translateY(${y * 0.25}px)`;
+        hero.style.opacity = String(1 - p * 0.7);
+      }
+      heroTicking = false;
+    });
+  }, { passive: true });
 }
 
 /* ================================================================== *
@@ -1150,7 +1585,6 @@ function openDownload() {
   const scrollbarWidth = getScrollbarWidth();
   if (scrollbarWidth > 0) {
     document.body.style.paddingRight = scrollbarWidth + 'px';
-    const nav = document.querySelector('nav');
     if (nav) {
       nav.style.paddingRight = 'calc(var(--nav-padding-x) + ' + scrollbarWidth + 'px)';
     }
@@ -1160,8 +1594,10 @@ function openDownload() {
   dlOverlay.classList.add('open');
   dlOverlay.setAttribute('aria-hidden', 'false');
 
-  const firstOption = dlOverlay.querySelector('.dl-option');
-  if (firstOption) firstOption.focus();
+  window.setTimeout(() => {
+    const firstOption = dlOverlay.querySelector('.dl-option');
+    if (firstOption) firstOption.focus();
+  }, 250);
 }
 
 function closeDownload() {
@@ -1173,7 +1609,6 @@ function closeDownload() {
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
 
-  const nav = document.querySelector('nav');
   if (nav) nav.style.paddingRight = '';
 
   if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
