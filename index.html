@@ -188,7 +188,7 @@ nav.scrolled {
 .nav-right {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .nav-links {
@@ -208,11 +208,40 @@ nav.scrolled {
   transition: background .45s var(--smooth), color .45s var(--smooth);
 }
 
+button.nav-link {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  cursor: pointer;
+  line-height: normal;
+}
+
 .nav-link:hover,
 .nav-link:focus-visible {
   background: color-mix(in srgb, var(--md-primary) 10%, transparent);
   color: var(--md-primary);
   outline: none;
+}
+
+/* AI button — accent pill so it stands apart from nav links */
+.ai-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  font-weight: 600;
+}
+
+.ai-btn .material-symbols-rounded {
+  font-size: 15px;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 20;
+}
+
+.ai-btn:hover,
+.ai-btn:focus-visible {
+  background: color-mix(in srgb, var(--md-tertiary-container) 75%, var(--md-tertiary));
+  color: var(--md-on-tertiary-container);
 }
 
 .lang-switcher {
@@ -251,7 +280,7 @@ nav.scrolled {
   color: var(--md-on-primary);
 }
 
-@media (max-width: 640px) {
+@media (max-width: 700px) {
   nav {
     --nav-padding-x: 14px;
     height: 56px;
@@ -262,9 +291,10 @@ nav.scrolled {
   .nav-links { gap: 0; }
   .nav-link { padding: 5px 8px; font-size: 12px; }
   .lang-btn { padding: 5px 9px; font-size: 10px; }
+  .ai-btn .material-symbols-rounded { font-size: 13px; }
 }
 
-@media (max-width: 400px) {
+@media (max-width: 520px) {
   .nav-links { display: none; }
 }
 
@@ -765,6 +795,76 @@ section {
   margin-bottom: 24px;
 }
 
+/* AI modal content */
+.ai-modal {
+  width: min(520px, 100%);
+}
+
+.ai-content {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--md-on-surface-variant);
+  margin-bottom: 8px;
+}
+
+.ai-content p {
+  margin-bottom: 0;
+}
+
+.ai-content .ai-question {
+  font-size: 16px;
+  color: var(--md-on-surface);
+  margin-bottom: 12px;
+}
+
+.ai-content .ai-answer {
+  font-size: 15px;
+  color: var(--md-primary);
+  font-weight: 600;
+  margin-bottom: 22px;
+  padding: 12px 16px;
+  background: color-mix(in srgb, var(--md-primary) 10%, transparent);
+  border-radius: 14px;
+  border-left: 4px solid var(--md-primary);
+}
+
+.ai-content .ai-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ai-content .ai-list li {
+  position: relative;
+  padding: 14px 16px 14px 42px;
+  background: color-mix(in srgb, var(--md-surface-variant) 60%, transparent);
+  border-radius: 14px;
+  border-left: 3px solid var(--md-primary);
+}
+
+.ai-content .ai-list li::before {
+  content: '✦';
+  position: absolute;
+  left: 15px;
+  top: 13px;
+  color: var(--md-primary);
+  font-size: 16px;
+  line-height: 1.4;
+}
+
+.ai-content .ai-list li strong {
+  color: var(--md-on-surface);
+}
+
+.ai-content .ai-footer {
+  font-style: italic;
+  color: var(--md-on-surface-variant);
+  margin-top: 4px;
+}
+
 .dl-options {
   display: flex;
   flex-direction: column;
@@ -973,6 +1073,10 @@ footer a:hover::after {
       <a href="#multiplayer" class="nav-link" data-i18n="nav.multiplayer">Multiplayer</a>
       <a href="#cta" class="nav-link" data-i18n="nav.download">Download</a>
     </div>
+    <button type="button" class="nav-link ai-btn" onclick="openAIInfo()">
+      <span class="material-symbols-rounded">smart_toy</span>
+      <span data-i18n="nav.ai">Is this AI?</span>
+    </button>
   </div>
 </nav>
 
@@ -1038,7 +1142,7 @@ footer a:hover::after {
         <span class="material-symbols-rounded">garage</span>
       </div>
       <h3 data-i18n="f5.title">Garage &amp; workshop</h3>
-      <p data-i18n="f5.desc">Several unique locations with different equipment and interiors.</p>
+      <p data-i18n="f5.desc">Several unique locations with different equipment and interiors. Unlock new ones as you progress.</p>
     </div>
     <div class="feature-card reveal">
       <div class="feature-icon">
@@ -1218,13 +1322,30 @@ footer a:hover::after {
         </div>
         <div class="dl-option-info">
           <strong>Python</strong>
-          <span data-i18n="se.python.info">Stable · cross-platform · .exe</span>
+          <span data-i18n="se.python.info">Stable · cross-platform · .zip</span>
         </div>
         <span class="material-symbols-rounded" style="color:var(--md-primary)">open_in_new</span>
       </a>
 
     </div>
     <button type="button" class="dl-close" onclick="closeModal()" data-i18n="dl.cancel">Cancel</button>
+  </div>
+</div>
+
+<!-- "Is this AI?" modal -->
+<div class="dl-overlay" id="aiOverlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="aiModalTitle" onclick="handleOverlayClick(event)">
+  <div class="dl-modal ai-modal">
+    <h3 id="aiModalTitle" data-i18n="ai.title">Is this AI?</h3>
+    <div class="ai-content" data-i18n="ai.content">
+      <p class="ai-question"><strong>Was this mod made by AI?</strong></p>
+      <p class="ai-answer">No, this site and mod are entirely hand-made!</p>
+      <ul class="ai-list">
+        <li><strong>Site design:</strong> Material Design 3 Expressive. This system lets you create incredibly smooth and modern interfaces that are sometimes mistaken for something made by algorithms.</li>
+        <li><strong>Mod development:</strong> Unity 2021. Hundreds of hours of work on code, UI, and gameplay.</li>
+      </ul>
+      <p class="ai-footer">There isn't a single generated line here. Everything was made by a human who loves this project.</p>
+    </div>
+    <button type="button" class="dl-close" onclick="closeModal()" data-i18n="ai.close">Got it</button>
   </div>
 </div>
 
@@ -1245,6 +1366,7 @@ const translations = {
     'nav.features': 'Features',
     'nav.multiplayer': 'Multiplayer',
     'nav.download': 'Download',
+    'nav.ai': 'Is this AI?',
 
     'hero.eyebrow': 'PC Simulator',
     'hero.w1': 'Build',
@@ -1264,7 +1386,7 @@ const translations = {
     'f3.title': 'Daily Market',
     'f3.desc': 'Buy rare components on the daily market and unlock exclusive items with bitcoins.',
     'f5.title': 'Garage &amp; workshop',
-    'f5.desc': 'Several unique locations with different equipment and interiors.',
+    'f5.desc': 'Several unique locations with different equipment and interiors. Unlock new ones as you progress.',
     'f6.title': 'Save system',
     'f6.desc': 'Save your progress to .pc files, share builds with friends and load ready-made configurations.',
 
@@ -1305,7 +1427,18 @@ const translations = {
     'se.title': 'Save Editor',
     'se.sub': 'Choose a version to download',
     'se.rust.info': 'Optimized · fastest performance · .exe',
-    'se.python.info': 'Stable · cross-platform · .exe',
+    'se.python.info': 'Stable · cross-platform · .zip',
+
+    'ai.title': 'Is this AI?',
+    'ai.close': 'Got it',
+    'ai.content':
+      '<p class="ai-question"><strong>Was this mod made by AI?</strong></p>' +
+      '<p class="ai-answer">No, this site and mod are entirely hand-made!</p>' +
+      '<ul class="ai-list">' +
+        '<li><strong>Site design:</strong> Material Design 3 Expressive. This system lets you create incredibly smooth and modern interfaces that are sometimes mistaken for something made by algorithms.</li>' +
+        '<li><strong>Mod development:</strong> Unity 2021. Hundreds of hours of work on code, UI, and gameplay.</li>' +
+      '</ul>' +
+      '<p class="ai-footer">There isn\'t a single generated line here. Everything was made by a human who loves this project.</p>',
 
     'footer.copy': '© 2026 Grey PC Simulator · Made with ❤️ ·'
   },
@@ -1314,6 +1447,7 @@ const translations = {
     'nav.features': 'Возможности',
     'nav.multiplayer': 'Мультиплеер',
     'nav.download': 'Скачать',
+    'nav.ai': 'Это ИИ?',
 
     'hero.eyebrow': 'Симулятор ПК',
     'hero.w1': 'Собери',
@@ -1333,7 +1467,7 @@ const translations = {
     'f3.title': 'Ежедневный рынок',
     'f3.desc': 'Покупай редкие компоненты на ежедневном рынке и открывай эксклюзивные предметы за биткоины.',
     'f5.title': 'Гараж и мастерская',
-    'f5.desc': 'Несколько уникальных локаций с разным оборудованием и интерьером.',
+    'f5.desc': 'Несколько уникальных локаций с разным оборудованием и интерьером. Открывай новые по мере прогресса.',
     'f6.title': 'Система сохранений',
     'f6.desc': 'Сохраняй прогресс в .pc-файлы, делись сборками с друзьями и загружай готовые конфигурации.',
 
@@ -1374,7 +1508,18 @@ const translations = {
     'se.title': 'Редактор сохранений',
     'se.sub': 'Выбери версию для скачивания',
     'se.rust.info': 'Оптимизированный · максимальная скорость · .exe',
-    'se.python.info': 'Стабильная · кроссплатформенный · .exe',
+    'se.python.info': 'Стабильная · кроссплатформенный · .zip',
+
+    'ai.title': 'Это ИИ?',
+    'ai.close': 'Понятно',
+    'ai.content':
+      '<p class="ai-question"><strong>Этот мод сделан ИИ?</strong></p>' +
+      '<p class="ai-answer">Нет, этот сайт и мод полностью сделаны вручную!</p>' +
+      '<ul class="ai-list">' +
+        '<li><strong>Дизайн сайта:</strong> Material Design 3 Expressive. Эта система позволяет создавать невероятно плавные и современные интерфейсы, которые иногда путают с творением алгоритмов.</li>' +
+        '<li><strong>Разработка мода:</strong> Unity 2021. Сотни часов работы над кодом, UI и геймплеем.</li>' +
+      '</ul>' +
+      '<p class="ai-footer">Здесь нет ни одной сгенерированной строчки. Всё сделано руками человека, который любит этот проект.</p>',
 
     'footer.copy': '© 2026 Grey PC Simulator · Сделано с ❤️ ·'
   }
@@ -1551,10 +1696,11 @@ if (hero && !prefersReducedMotion) {
 }
 
 /* ================================================================== *
- * Unified modal system (Download + Save Editor)
+ * Unified modal system (Download + Save Editor + AI)
  * ================================================================== */
 const dlOverlay = document.getElementById('dlOverlay');
 const seOverlay = document.getElementById('seOverlay');
+const aiOverlay = document.getElementById('aiOverlay');
 let previousActiveElement = null;
 let activeOverlay = null;
 
@@ -1581,7 +1727,7 @@ function openModal(overlay) {
   activeOverlay = overlay;
 
   window.setTimeout(() => {
-    const firstOption = overlay.querySelector('.dl-option');
+    const firstOption = overlay.querySelector('.dl-option, .dl-close');
     if (firstOption) firstOption.focus();
   }, 250);
 }
@@ -1605,9 +1751,12 @@ function closeModal() {
 
 function openDownload() { openModal(dlOverlay); }
 function openSaveEditor() { openModal(seOverlay); }
+function openAIInfo() { openModal(aiOverlay); }
 
 function handleOverlayClick(e) {
-  if (e.target === dlOverlay || e.target === seOverlay) closeModal();
+  if (e.target === dlOverlay || e.target === seOverlay || e.target === aiOverlay) {
+    closeModal();
+  }
 }
 
 function trapFocus(e) {
