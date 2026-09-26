@@ -18,6 +18,7 @@
   --md-secondary: #625B71;
   --md-tertiary: #7D5260;
   --md-tertiary-container: #FFD8E4;
+  --md-on-tertiary-container: #31111D;
   --md-surface: #FEF7FF;
   --md-surface-variant: #E7E0EC;
   --md-on-surface: #1C1B1F;
@@ -28,6 +29,7 @@
   --md-shadow: rgba(0,0,0,.15);
   --spring: cubic-bezier(.34,1.56,.64,1);
   --smooth: cubic-bezier(.2,0,0,1);
+  --expressive: cubic-bezier(.38,1.21,.22,1);
   --ease-out-expo: cubic-bezier(.16,1,.3,1);
   --nav-height: 64px;
 }
@@ -41,6 +43,7 @@
     --md-secondary: #CCC2DC;
     --md-tertiary: #EFB8C8;
     --md-tertiary-container: #633B48;
+    --md-on-tertiary-container: #FFD8E4;
     --md-surface: #141218;
     --md-surface-variant: #49454F;
     --md-on-surface: #E6E1E5;
@@ -66,15 +69,17 @@ body {
   background: var(--md-surface);
   color: var(--md-on-surface);
   overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
 }
 
 /* ------------------------------------------------------------------ *
- * LIVING BACKGROUND (Animated Blobs)
+ * LIVING BACKGROUND
  * ------------------------------------------------------------------ */
 .bg-blobs {
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: -1;
+  z-index: 0;
   overflow: hidden;
   pointer-events: none;
 }
@@ -84,55 +89,46 @@ body {
   border-radius: 50%;
   filter: blur(100px);
   opacity: 0.35;
-  will-change: transform, left, top, background;
+  will-change: transform, left, top, filter;
   animation:
     float 25s infinite ease-in-out,
     hueShift 18s infinite ease-in-out;
-  transition: background 1.5s var(--smooth);
 }
 
 .blob-1 {
   background: var(--md-primary);
-  width: 45vw;
-  height: 45vw;
-  top: -10%;
-  left: -10%;
+  width: 45vw; height: 45vw;
+  top: 2%; left: -10%;
   animation-delay: 0s, 0s;
   animation-duration: 22s, 18s;
 }
 .blob-2 {
   background: var(--md-tertiary);
-  width: 40vw;
-  height: 40vw;
-  bottom: -15%;
-  right: -10%;
+  width: 40vw; height: 40vw;
+  top: 30%; right: -10%;
   animation-delay: -6s, -4s;
   animation-duration: 28s, 22s;
 }
 .blob-3 {
   background: #6750A4;
-  width: 35vw;
-  height: 35vw;
-  top: 30%;
-  left: 40%;
+  width: 35vw; height: 35vw;
+  top: 55%; left: 20%;
   animation-delay: -12s, -8s;
   animation-duration: 26s, 20s;
 }
 .blob-4 {
   background: #7D5260;
-  width: 30vw;
-  height: 30vw;
-  top: 5%;
-  right: 15%;
+  width: 30vw; height: 30vw;
+  top: 80%; right: 15%;
   animation-delay: -18s, -12s;
   animation-duration: 24s, 24s;
 }
 
 @keyframes float {
-  0%   { left: 0; top: 0; }
-  33%  { left: 4%; top: -6%; }
-  66%  { left: -3%; top: 5%; }
-  100% { left: 0; top: 0; }
+  0%   { margin-left: 0; margin-top: 0; }
+  33%  { margin-left: 4%; margin-top: -4%; }
+  66%  { margin-left: -3%; margin-top: 3%; }
+  100% { margin-left: 0; margin-top: 0; }
 }
 
 @keyframes hueShift {
@@ -150,9 +146,7 @@ section, .multi-section, [id] {
 nav {
   --nav-padding-x: 24px;
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
+  top: 0; left: 0; right: 0;
   z-index: 100;
   display: flex;
   align-items: center;
@@ -163,7 +157,7 @@ nav {
   border-bottom: 1px solid var(--md-outline-variant);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  transition: padding-right .2s ease, box-shadow .3s ease;
+  transition: padding-right .2s ease, box-shadow .4s var(--smooth);
 }
 
 nav.scrolled {
@@ -181,40 +175,20 @@ nav.scrolled {
   font-variation-settings: 'wdth' 110;
   white-space: nowrap;
   text-decoration: none;
-  transition: transform .35s var(--spring);
-}
-
-.nav-logo:hover {
-  transform: scale(1.04);
+  flex-shrink: 0;
 }
 
 .nav-logo img {
-  width: 36px;
-  height: 36px;
+  width: 36px; height: 36px;
   border-radius: 8px;
   object-fit: cover;
   display: block;
-  transition: transform .5s var(--spring), box-shadow .4s var(--smooth);
-  animation: logoPulse 4s ease-in-out infinite;
 }
 
-.nav-logo:hover img {
-  transform: rotate(-6deg) scale(1.1);
-  box-shadow: 0 4px 16px color-mix(in srgb, var(--md-primary) 40%, transparent);
-  animation-play-state: paused;
-}
-
-@keyframes logoPulse {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-primary) 30%, transparent); }
-  50%      { box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 0%, transparent); }
-}
-
-@media (max-width: 480px) {
-  .nav-logo img {
-    width: 28px;
-    height: 28px;
-    border-radius: 6px;
-  }
+.nav-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .nav-links {
@@ -230,54 +204,68 @@ nav.scrolled {
   font-weight: 500;
   color: var(--md-on-surface-variant);
   text-decoration: none;
-  transition: background .3s var(--smooth), color .3s var(--smooth);
   white-space: nowrap;
-  overflow: hidden;
-}
-
-.nav-link::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: color-mix(in srgb, var(--md-primary) 10%, transparent);
-  transform: scale(.6);
-  opacity: 0;
-  transition: transform .35s var(--spring), opacity .25s var(--smooth);
-}
-
-.nav-link:hover::before,
-.nav-link:focus-visible::before {
-  transform: scale(1);
-  opacity: 1;
+  transition: background .45s var(--smooth), color .45s var(--smooth);
 }
 
 .nav-link:hover,
 .nav-link:focus-visible {
+  background: color-mix(in srgb, var(--md-primary) 10%, transparent);
   color: var(--md-primary);
   outline: none;
 }
 
-.nav-link span {
-  position: relative;
-  z-index: 1;
+.lang-switcher {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 50px;
+  background: color-mix(in srgb, var(--md-primary) 8%, transparent);
+  gap: 2px;
+  flex-shrink: 0;
 }
 
-@media (max-width: 480px) {
+.lang-btn {
+  border: none;
+  background: transparent;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  padding: 6px 12px;
+  border-radius: 50px;
+  color: var(--md-on-surface-variant);
+  cursor: pointer;
+  transition: background .35s var(--smooth), color .35s var(--smooth);
+}
+
+.lang-btn:hover { color: var(--md-primary); }
+
+.lang-btn:focus-visible {
+  outline: 2px solid var(--md-primary);
+  outline-offset: 2px;
+}
+
+.lang-btn.active {
+  background: var(--md-primary);
+  color: var(--md-on-primary);
+}
+
+@media (max-width: 640px) {
   nav {
-    --nav-padding-x: 12px;
+    --nav-padding-x: 14px;
     height: 56px;
   }
-  .nav-logo {
-    font-size: 18px;
-  }
-  .nav-links {
-    gap: 2px;
-  }
-  .nav-link {
-    padding: 6px 10px;
-    font-size: 13px;
-  }
+  .nav-logo { font-size: 16px; gap: 7px; }
+  .nav-logo img { width: 26px; height: 26px; border-radius: 6px; }
+  .nav-right { gap: 6px; }
+  .nav-links { gap: 0; }
+  .nav-link { padding: 5px 8px; font-size: 12px; }
+  .lang-btn { padding: 5px 9px; font-size: 10px; }
+}
+
+@media (max-width: 400px) {
+  .nav-links { display: none; }
 }
 
 /* ------------------------------------------------------------------ *
@@ -317,12 +305,7 @@ nav.scrolled {
   letter-spacing: .5px;
   text-transform: uppercase;
   margin-bottom: 24px;
-  animation: popIn .8s var(--spring) both, eyebrowGlow 3s ease-in-out infinite 1s;
-}
-
-@keyframes eyebrowGlow {
-  0%, 100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--md-primary) 25%, transparent); }
-  50%      { box-shadow: 0 0 0 8px color-mix(in srgb, var(--md-primary) 0%, transparent); }
+  animation: popIn .8s var(--spring) both;
 }
 
 .hero-title {
@@ -337,6 +320,7 @@ nav.scrolled {
 .hero-title .line {
   display: block;
   overflow: hidden;
+  padding-bottom: .05em;
 }
 
 .hero-title .word {
@@ -350,33 +334,11 @@ nav.scrolled {
 .hero-title .line:nth-child(2) .word:nth-child(2) { animation-delay: .45s; }
 
 @keyframes wordReveal {
-  from {
-    opacity: 0;
-    transform: translateY(100%) rotate(6deg);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) rotate(0);
-  }
+  from { opacity: 0; transform: translateY(100%) rotate(6deg); }
+  to   { opacity: 1; transform: translateY(0) rotate(0); }
 }
 
-.hero-title .accent {
-  color: var(--md-primary);
-  background: linear-gradient(120deg,
-    var(--md-primary) 0%,
-    var(--md-tertiary) 50%,
-    var(--md-primary) 100%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  animation: gradientFlow 6s linear infinite;
-}
-
-@keyframes gradientFlow {
-  0%   { background-position: 0% center; }
-  100% { background-position: 200% center; }
-}
+.hero-title .accent { color: var(--md-primary); }
 
 .hero-sub {
   margin-top: 20px;
@@ -396,6 +358,9 @@ nav.scrolled {
   animation: slideUp .9s var(--ease-out-expo) .65s both;
 }
 
+/* ------------------------------------------------------------------ *
+ * Buttons
+ * ------------------------------------------------------------------ */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -408,61 +373,40 @@ nav.scrolled {
   cursor: pointer;
   text-decoration: none;
   border-radius: 50px;
-  transition:
-    border-radius .5s var(--spring),
-    transform .35s var(--spring),
-    box-shadow .35s var(--smooth),
-    background .3s var(--smooth);
   position: relative;
-  overflow: hidden;
   isolation: isolate;
+  overflow: hidden;
+  transition:
+    border-radius .55s var(--smooth),
+    transform .55s var(--smooth),
+    background .35s var(--smooth);
 }
 
 .btn::before {
   content: '';
   position: absolute;
-  top: 0;
-  left: -120%;
-  width: 80%;
-  height: 100%;
-  background: linear-gradient(115deg,
-    transparent 0%,
-    rgba(255,255,255,.4) 50%,
-    transparent 100%);
-  transform: skewX(-20deg);
-  transition: left .7s var(--ease-out-expo);
-  z-index: 2;
+  inset: 0;
+  border-radius: inherit;
+  background: currentColor;
+  opacity: 0;
+  transition: opacity .3s var(--smooth);
   pointer-events: none;
+}
+
+.btn > * { position: relative; z-index: 1; }
+
+.btn:hover {
+  border-radius: 14px;
+  transform: translateY(-2px) scale(1.04);
+  transition:
+    border-radius .5s var(--expressive),
+    transform .5s var(--expressive),
+    background .3s var(--smooth);
 }
 
 .btn:hover::before {
-  left: 130%;
-}
-
-.btn::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: currentColor;
-  opacity: 0;
-  border-radius: inherit;
-  transition: opacity .25s;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.btn:hover::after {
   opacity: .08;
-}
-
-.btn > * {
-  position: relative;
-  z-index: 3;
-}
-
-.btn:active {
-  transform: scale(.95);
-  border-radius: 16px;
+  transition: opacity .25s var(--smooth);
 }
 
 .btn:focus-visible {
@@ -470,47 +414,25 @@ nav.scrolled {
   outline-offset: 3px;
 }
 
+.btn:active {
+  border-radius: 8px;
+  transform: translateY(0) scale(.96);
+  transition:
+    border-radius .2s var(--smooth),
+    transform .2s var(--smooth),
+    background .2s var(--smooth);
+}
+
+.btn:active::before { opacity: .16; }
+
 .btn-filled {
   background: var(--md-primary);
   color: var(--md-on-primary);
-  box-shadow: 0 2px 8px var(--md-shadow);
-}
-
-.btn-filled:hover {
-  box-shadow: 0 8px 28px color-mix(in srgb, var(--md-primary) 45%, transparent);
-  border-radius: 20px;
-  transform: translateY(-2px);
 }
 
 .btn-tonal {
   background: var(--md-primary-container);
   color: var(--md-on-primary-container);
-}
-
-.btn-tonal:hover {
-  border-radius: 20px;
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px var(--md-shadow);
-}
-
-/* Wave */
-.wave {
-  display: block;
-  width: 100%;
-  height: 80px;
-  margin-top: -1px;
-  margin-bottom: -1px;
-  vertical-align: bottom;
-  background: transparent;
-  fill: color-mix(in srgb, var(--md-primary) 6%, var(--md-surface));
-  position: relative;
-  z-index: 1;
-  opacity: 0;
-  animation: waveIn 1.2s var(--ease-out-expo) .7s forwards;
-}
-
-@keyframes waveIn {
-  to { opacity: 1; }
 }
 
 section {
@@ -530,6 +452,37 @@ section {
   margin-bottom: 12px;
 }
 
+.label-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.label-row .section-label { margin-bottom: 0; }
+
+.beta-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px 4px 8px;
+  border-radius: 50px;
+  background: var(--md-tertiary-container);
+  color: var(--md-on-tertiary-container);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .8px;
+  text-transform: uppercase;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.beta-badge .material-symbols-rounded {
+  font-size: 14px;
+  font-variation-settings: 'FILL' 1, 'wght' 600, 'GRAD' 0, 'opsz' 20;
+}
+
 .section-title {
   font-size: clamp(28px, 4.5vw, 48px);
   font-weight: 800;
@@ -539,59 +492,30 @@ section {
   max-width: 650px;
 }
 
-/* Feature cards with 3D tilt */
 .features-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 16px;
   margin-top: 44px;
-  perspective: 1200px;
 }
 
 .feature-card {
-  background: color-mix(in srgb, var(--md-surface-variant) 90%, transparent);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+  background: color-mix(in srgb, var(--md-surface-variant) 75%, transparent);
+  backdrop-filter: blur(20px) saturate(140%);
+  -webkit-backdrop-filter: blur(20px) saturate(140%);
   border-radius: 28px;
   padding: 32px;
   border: 1px solid color-mix(in srgb, var(--md-outline-variant) 50%, transparent);
-  transition:
-    transform .5s var(--spring),
-    box-shadow .4s var(--smooth),
-    border-color .4s var(--smooth);
+  transition: border-color .5s var(--smooth);
   cursor: default;
-  transform-style: preserve-3d;
-  will-change: transform;
-  position: relative;
-  overflow: hidden;
-}
-
-.feature-card::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(
-    circle at var(--mx, 50%) var(--my, 50%),
-    color-mix(in srgb, var(--md-primary) 18%, transparent) 0%,
-    transparent 60%);
-  opacity: 0;
-  transition: opacity .4s var(--smooth);
-  pointer-events: none;
-  border-radius: inherit;
-}
-
-.feature-card:hover::before {
-  opacity: 1;
 }
 
 .feature-card:hover {
-  box-shadow: 0 20px 48px var(--md-shadow);
-  border-color: color-mix(in srgb, var(--md-primary) 40%, transparent);
+  border-color: color-mix(in srgb, var(--md-primary) 35%, transparent);
 }
 
 .feature-icon {
-  width: 56px;
-  height: 56px;
+  width: 56px; height: 56px;
   border-radius: 18px;
   background: var(--md-primary-container);
   color: var(--md-on-primary-container);
@@ -600,20 +524,6 @@ section {
   justify-content: center;
   font-size: 28px;
   margin-bottom: 20px;
-  transition: border-radius .5s var(--spring), transform .5s var(--spring);
-}
-
-.feature-card:hover .feature-icon {
-  border-radius: 28px;
-  transform: scale(1.1) rotate(-6deg);
-}
-
-.feature-icon .material-symbols-rounded {
-  transition: transform .5s var(--spring);
-}
-
-.feature-card:hover .feature-icon .material-symbols-rounded {
-  transform: rotate(6deg);
 }
 
 .feature-card h3 {
@@ -629,7 +539,6 @@ section {
   color: var(--md-on-surface-variant);
 }
 
-/* Multiplayer */
 .multi-section {
   background: color-mix(in srgb, var(--md-primary) 6%, var(--md-surface));
   backdrop-filter: blur(8px);
@@ -668,7 +577,6 @@ section {
   justify-content: center;
   font-size: 80px;
   box-shadow: 0 16px 48px var(--md-shadow);
-  transition: border-radius .6s var(--spring), transform .6s var(--spring);
   user-select: none;
   animation: gradientShift 8s ease-in-out infinite;
 }
@@ -676,11 +584,6 @@ section {
 @keyframes gradientShift {
   0%, 100% { background-position: 0% 50%; }
   50%      { background-position: 100% 50%; }
-}
-
-.multi-visual:hover {
-  border-radius: 20px;
-  transform: rotate(-2deg) scale(1.03);
 }
 
 .multi-points {
@@ -694,26 +597,14 @@ section {
   display: flex;
   align-items: flex-start;
   gap: 16px;
-  transition: transform .4s var(--spring);
-}
-
-.point:hover {
-  transform: translateX(6px);
 }
 
 .point-dot {
-  width: 10px;
-  height: 10px;
+  width: 10px; height: 10px;
   border-radius: 50%;
   background: var(--md-primary);
   margin-top: 6px;
   flex-shrink: 0;
-  transition: transform .4s var(--spring), box-shadow .4s var(--smooth);
-}
-
-.point:hover .point-dot {
-  transform: scale(1.4);
-  box-shadow: 0 0 0 6px color-mix(in srgb, var(--md-primary) 20%, transparent);
 }
 
 .point p {
@@ -722,11 +613,8 @@ section {
   color: var(--md-on-surface-variant);
 }
 
-.point strong {
-  color: var(--md-on-surface);
-}
+.point strong { color: var(--md-on-surface); }
 
-/* Chips */
 .saves-chips {
   display: flex;
   flex-wrap: wrap;
@@ -747,23 +635,18 @@ section {
   font-weight: 500;
   line-height: 1.2;
   color: var(--md-on-surface-variant);
-  transition: all .4s var(--spring);
   cursor: pointer;
   backdrop-filter: blur(4px);
-  position: relative;
-  overflow: hidden;
+  transition:
+    background .45s var(--smooth),
+    border-color .45s var(--smooth),
+    color .45s var(--smooth);
 }
 
 .chip:hover {
   border-color: var(--md-primary);
-  background: color-mix(in srgb, var(--md-primary) 15%, transparent);
+  background: color-mix(in srgb, var(--md-primary) 12%, transparent);
   color: var(--md-primary);
-  transform: translateY(-3px) scale(1.05);
-  box-shadow: 0 6px 16px var(--md-shadow);
-}
-
-.chip:active {
-  transform: translateY(0) scale(.98);
 }
 
 .chip:focus-visible {
@@ -775,24 +658,8 @@ section {
   background: var(--md-primary);
   color: var(--md-on-primary);
   border-color: var(--md-primary);
-  animation: chipPop .5s var(--spring);
 }
 
-@keyframes chipPop {
-  0%   { transform: scale(1); }
-  50%  { transform: scale(1.12); }
-  100% { transform: scale(1); }
-}
-
-.chip .material-symbols-rounded {
-  transition: transform .4s var(--spring);
-}
-
-.chip:hover .material-symbols-rounded {
-  transform: rotate(-10deg) scale(1.1);
-}
-
-/* CTA */
 .cta-section {
   text-align: center;
   padding: 100px 24px;
@@ -835,22 +702,11 @@ section {
   font-size: 14px;
   font-weight: 500;
   color: var(--md-on-surface-variant);
-  transition: transform .4s var(--spring), background .3s var(--smooth);
-}
-
-.badge:hover {
-  transform: translateY(-4px);
-  background: color-mix(in srgb, var(--md-primary) 15%, var(--md-surface-variant));
 }
 
 .badge .material-symbols-rounded {
   font-size: 20px;
   color: var(--md-primary);
-  transition: transform .5s var(--spring);
-}
-
-.badge:hover .material-symbols-rounded {
-  transform: rotate(-12deg) scale(1.15);
 }
 
 /* Modal */
@@ -886,13 +742,13 @@ section {
   max-height: calc(100dvh - 32px);
   overflow-y: auto;
   box-shadow: 0 24px 64px rgba(0,0,0,.3);
-  transform: scale(.85) translateY(32px) rotate(-1deg);
+  transform: scale(.85) translateY(32px);
   opacity: 0;
   transition: transform .55s var(--spring), opacity .35s var(--smooth);
 }
 
 .dl-overlay.open .dl-modal {
-  transform: scale(1) translateY(0) rotate(0);
+  transform: scale(1) translateY(0);
   opacity: 1;
 }
 
@@ -926,50 +782,21 @@ section {
   text-decoration: none;
   color: var(--md-on-surface);
   cursor: pointer;
-  transition: border-color .35s var(--spring), background .35s var(--smooth), transform .4s var(--spring);
-  position: relative;
-  overflow: hidden;
-}
-
-.dl-option::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  border-radius: 50%;
-  background: color-mix(in srgb, var(--md-primary) 15%, transparent);
-  transform: translate(-50%, -50%);
-  transition: width .6s var(--ease-out-expo), height .6s var(--ease-out-expo);
-  pointer-events: none;
-}
-
-.dl-option:hover::after {
-  width: 500px;
-  height: 500px;
+  transition:
+    border-color .45s var(--smooth),
+    background .4s var(--smooth);
 }
 
 .dl-option:hover,
 .dl-option:focus-visible {
   border-color: var(--md-primary);
-  transform: translateY(-3px) scale(1.02);
+  background: color-mix(in srgb, var(--md-primary) 8%, transparent);
   outline: none;
-  box-shadow: 0 8px 24px var(--md-shadow);
 }
 
 .dl-option:focus-visible {
   outline: 3px solid var(--md-primary);
   outline-offset: 2px;
-}
-
-.dl-option:active {
-  transform: translateY(0) scale(.98);
-}
-
-.dl-option > * {
-  position: relative;
-  z-index: 1;
 }
 
 .dl-option-icon {
@@ -979,16 +806,14 @@ section {
   display: flex;
   align-items: center;
   justify-content: center;
-  transition: transform .5s var(--spring);
+  border-radius: 14px;
+  background: var(--md-primary-container);
+  color: var(--md-on-primary-container);
 }
 
-.dl-option:hover .dl-option-icon {
-  transform: scale(1.1) rotate(-5deg);
-}
-
-.dl-option-icon svg {
-  width: 36px;
-  height: 36px;
+.dl-option-icon .material-symbols-rounded {
+  font-size: 28px;
+  font-variation-settings: 'FILL' 1, 'wght' 500, 'GRAD' 0, 'opsz' 24;
 }
 
 .dl-option-info {
@@ -1021,7 +846,7 @@ section {
   font-weight: 500;
   color: var(--md-on-surface-variant);
   cursor: pointer;
-  transition: background .3s var(--smooth), color .3s var(--smooth);
+  transition: background .4s var(--smooth), color .4s var(--smooth);
 }
 
 .dl-close:hover,
@@ -1036,7 +861,6 @@ section {
   outline-offset: 2px;
 }
 
-/* Footer */
 footer {
   border-top: 1px solid var(--md-outline-variant);
   padding: 32px 24px;
@@ -1053,20 +877,18 @@ footer a {
   color: var(--md-primary);
   text-decoration: none;
   position: relative;
-  transition: color .3s var(--smooth);
+  transition: color .4s var(--smooth);
 }
 
 footer a::after {
   content: '';
   position: absolute;
-  left: 0;
-  bottom: -2px;
-  width: 100%;
-  height: 1.5px;
+  left: 0; bottom: -2px;
+  width: 100%; height: 1.5px;
   background: var(--md-primary);
   transform: scaleX(0);
   transform-origin: right;
-  transition: transform .4s var(--ease-out-expo);
+  transition: transform .5s var(--ease-out-expo);
 }
 
 footer a:hover::after {
@@ -1075,22 +897,13 @@ footer a:hover::after {
 }
 
 .footer-logo {
-  width: 48px;
-  height: 48px;
+  width: 48px; height: 48px;
   border-radius: 10px;
   object-fit: cover;
   margin-bottom: 12px;
   display: inline-block;
-  transition: transform .5s var(--spring);
 }
 
-.footer-logo:hover {
-  transform: rotate(8deg) scale(1.1);
-}
-
-/* ------------------------------------------------------------------ *
- * Reveal animations
- * ------------------------------------------------------------------ */
 .reveal {
   opacity: 0;
   transform: translateY(40px);
@@ -1103,33 +916,15 @@ footer a:hover::after {
   transform: none;
 }
 
-.reveal.reveal-left {
-  transform: translateX(-50px);
-}
+.reveal.reveal-left { transform: translateX(-50px); }
+.reveal.reveal-left.visible { transform: none; }
 
-.reveal.reveal-left.visible {
-  transform: none;
-}
+.reveal.reveal-right { transform: translateX(50px); }
+.reveal.reveal-right.visible { transform: none; }
 
-.reveal.reveal-right {
-  transform: translateX(50px);
-}
+.reveal.reveal-scale { transform: scale(.9); }
+.reveal.reveal-scale.visible { transform: none; }
 
-.reveal.reveal-right.visible {
-  transform: none;
-}
-
-.reveal.reveal-scale {
-  transform: scale(.9);
-}
-
-.reveal.reveal-scale.visible {
-  transform: none;
-}
-
-/* ------------------------------------------------------------------ *
- * Keyframes
- * ------------------------------------------------------------------ */
 @keyframes popIn {
   from { opacity: 0; transform: scale(.7); }
   to   { opacity: 1; transform: scale(1); }
@@ -1140,9 +935,6 @@ footer a:hover::after {
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* ------------------------------------------------------------------ *
- * Reduced motion
- * ------------------------------------------------------------------ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after {
@@ -1159,7 +951,6 @@ footer a:hover::after {
 </head>
 <body>
 
-<!-- Living Background Elements -->
 <div class="bg-blobs">
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
@@ -1172,88 +963,89 @@ footer a:hover::after {
     <img src="logo.png" alt="Grey PC logo">
     <span>Grey PC</span>
   </a>
-  <div class="nav-links">
-    <a href="#features" class="nav-link"><span>Features</span></a>
-    <a href="#multiplayer" class="nav-link"><span>Multiplayer</span></a>
-    <a href="#cta" class="nav-link"><span>Download</span></a>
+  <div class="nav-right">
+    <div class="lang-switcher" role="group" aria-label="Language / Язык">
+      <button type="button" class="lang-btn" data-lang="en" aria-pressed="true">EN</button>
+      <button type="button" class="lang-btn" data-lang="ru" aria-pressed="false">RU</button>
+    </div>
+    <div class="nav-links">
+      <a href="#features" class="nav-link" data-i18n="nav.features">Features</a>
+      <a href="#multiplayer" class="nav-link" data-i18n="nav.multiplayer">Multiplayer</a>
+      <a href="#cta" class="nav-link" data-i18n="nav.download">Download</a>
+    </div>
   </div>
 </nav>
 
 <section class="hero" id="heroSection">
   <div class="hero-eyebrow">
     <span class="material-symbols-rounded" style="font-size:14px">computer</span>
-    PC Simulator
+    <span data-i18n="hero.eyebrow">PC Simulator</span>
   </div>
   <h1 class="hero-title">
-    <span class="line"><span class="word">Build</span> <span class="word">your</span></span>
-    <span class="line"><span class="word accent">perfect</span> <span class="word accent">PC</span></span>
+    <span class="line">
+      <span class="word" data-i18n="hero.w1">Build</span>
+      <span class="word" data-i18n="hero.w2">your</span>
+    </span>
+    <span class="line">
+      <span class="word accent" data-i18n="hero.w3">perfect</span>
+      <span class="word accent" data-i18n="hero.w4">PC</span>
+    </span>
   </h1>
-  <p class="hero-sub">
+  <p class="hero-sub" data-i18n="hero.sub">
     Build, repair and upgrade virtual computers — solo or with a friend, in real time.
   </p>
   <div class="hero-actions">
     <button type="button" onclick="openDownload()" class="btn btn-filled">
       <span class="material-symbols-rounded">download</span>
-      <span>Download for free</span>
+      <span data-i18n="hero.download">Download for free</span>
     </button>
     <a href="#features" class="btn btn-tonal">
       <span class="material-symbols-rounded">play_circle</span>
-      <span>Learn more</span>
+      <span data-i18n="hero.learn">Learn more</span>
     </a>
   </div>
 </section>
 
-<svg class="wave" viewBox="0 0 1440 80" preserveAspectRatio="none" aria-hidden="true">
-  <path d="M0,40 C240,80 480,0 720,40 C960,80 1200,0 1440,40 L1440,80 L0,80 Z"/>
-</svg>
-
 <section id="features">
   <div class="reveal">
-    <div class="section-label">Features</div>
-    <h2 class="section-title">Everything a real master needs</h2>
+    <div class="section-label" data-i18n="features.label">Features</div>
+    <h2 class="section-title" data-i18n="features.title">Everything a real master needs</h2>
   </div>
   <div class="features-grid">
-    <div class="feature-card reveal" data-tilt>
+    <div class="feature-card reveal">
       <div class="feature-icon">
         <span class="material-symbols-rounded">memory</span>
       </div>
-      <h3>Realistic building</h3>
-      <p>Install CPUs, graphics cards, RAM and drives into real motherboard slots — with proper compatibility checks.</p>
+      <h3 data-i18n="f1.title">Realistic building</h3>
+      <p data-i18n="f1.desc">Install CPUs, graphics cards, RAM and drives into real motherboard slots — with proper compatibility checks.</p>
     </div>
-    <div class="feature-card reveal" data-tilt>
+    <div class="feature-card reveal">
       <div class="feature-icon">
         <span class="material-symbols-rounded">build</span>
       </div>
-      <h3>Repair &amp; diagnostics</h3>
-      <p>Fix broken PCs, track down faults, replace parts — just like in a real repair shop.</p>
+      <h3 data-i18n="f2.title">Repair &amp; diagnostics</h3>
+      <p data-i18n="f2.desc">Fix broken PCs, track down faults, replace parts — just like in a real repair shop.</p>
     </div>
-    <div class="feature-card reveal" data-tilt>
+    <div class="feature-card reveal">
       <div class="feature-icon">
         <span class="material-symbols-rounded">storefront</span>
       </div>
-      <h3>Daily Market</h3>
-      <p>Buy rare components on the daily market and unlock exclusive items with bitcoins.</p>
+      <h3 data-i18n="f3.title">Daily Market</h3>
+      <p data-i18n="f3.desc">Buy rare components on the daily market and unlock exclusive items with bitcoins.</p>
     </div>
-    <div class="feature-card reveal" data-tilt>
-      <div class="feature-icon">
-        <span class="material-symbols-rounded">pets</span>
-      </div>
-      <h3>Secret cat 🐱</h3>
-      <p>Find the hidden low-poly cat on every map. You can pick it up and put it on your desk.</p>
-    </div>
-    <div class="feature-card reveal" data-tilt>
+    <div class="feature-card reveal">
       <div class="feature-icon">
         <span class="material-symbols-rounded">garage</span>
       </div>
-      <h3>Garage &amp; workshop</h3>
-      <p>Several unique locations with different equipment and interiors. Unlock new ones as you progress.</p>
+      <h3 data-i18n="f5.title">Garage &amp; workshop</h3>
+      <p data-i18n="f5.desc">Several unique locations with different equipment and interiors. Unlock new ones as you progress.</p>
     </div>
-    <div class="feature-card reveal" data-tilt>
+    <div class="feature-card reveal">
       <div class="feature-icon">
         <span class="material-symbols-rounded">save</span>
       </div>
-      <h3>Save system</h3>
-      <p>Save your progress to .pc files, share builds with friends and load ready-made configurations.</p>
+      <h3 data-i18n="f6.title">Save system</h3>
+      <p data-i18n="f6.desc">Save your progress to .pc files, share builds with friends and load ready-made configurations.</p>
     </div>
   </div>
 </section>
@@ -1262,29 +1054,35 @@ footer a:hover::after {
   <div class="multi-inner">
     <div class="multi-visual reveal reveal-left" aria-hidden="true">🔗</div>
     <div class="reveal reveal-right">
-      <div class="section-label">Multiplayer</div>
-      <h2 class="section-title">Build together</h2>
+      <div class="label-row">
+        <div class="section-label" data-i18n="mp.label">Multiplayer</div>
+        <span class="beta-badge">
+          <span class="material-symbols-rounded">science</span>
+          BETA
+        </span>
+      </div>
+      <h2 class="section-title" data-i18n="mp.title">Build together</h2>
       <div class="multi-points">
         <div class="point">
           <div class="point-dot"></div>
-          <p><strong>P2P connection over IP</strong> — no server, just you and your friend connecting directly.</p>
+          <p data-i18n="mp.p1"><strong>P2P connection over IP</strong> — no server, just you and your friend connecting directly.</p>
         </div>
         <div class="point">
           <div class="point-dot"></div>
-          <p><strong>Shared building in real time</strong> — both players see every change instantly.</p>
+          <p data-i18n="mp.p2"><strong>Shared building in real time</strong> — both players see every change instantly.</p>
         </div>
         <div class="point">
           <div class="point-dot"></div>
-          <p><strong>The host picks the save</strong> — they load their file and are instantly inside, with no waiting in menus.</p>
+          <p data-i18n="mp.p3"><strong>The host picks the save</strong> — they load their file and are instantly inside, with no waiting in menus.</p>
         </div>
         <div class="point">
           <div class="point-dot"></div>
-          <p><strong>Robot avatar</strong> — see exactly where the other player is in the world.</p>
+          <p data-i18n="mp.p4"><strong>Robot avatar</strong> — see exactly where the other player is in the world.</p>
         </div>
       </div>
       <div style="margin-top:32px;">
         <a href="#cta" class="btn btn-filled">
-          <span>Try it with a friend</span>
+          <span data-i18n="mp.cta">Try it with a friend</span>
         </a>
       </div>
     </div>
@@ -1293,110 +1091,365 @@ footer a:hover::after {
 
 <section>
   <div class="reveal">
-    <div class="section-label">Configurations</div>
-    <h2 class="section-title">Built-in examples and your own builds</h2>
-    <p style="margin-top:16px;font-size:16px;color:var(--md-on-surface-variant);max-width:540px;line-height:1.6;">
+    <div class="section-label" data-i18n="cfg.label">Configurations</div>
+    <h2 class="section-title" data-i18n="cfg.title">Built-in examples and your own builds</h2>
+    <p style="margin-top:16px;font-size:16px;color:var(--md-on-surface-variant);max-width:540px;line-height:1.6;" data-i18n="cfg.desc">
       Start from a ready-made configuration or load one of your own .pc files — your save history lives right in the game.
     </p>
   </div>
   <div class="saves-chips reveal">
     <button type="button" class="chip" aria-pressed="false" onclick="toggleChip(this)">
-      <span class="material-symbols-rounded" style="font-size:16px">computer</span> Classic Build
+      <span class="material-symbols-rounded" style="font-size:16px">computer</span>
+      <span data-i18n="chip.classic">Classic Build</span>
     </button>
     <button type="button" class="chip" aria-pressed="false" onclick="toggleChip(this)">
-      <span class="material-symbols-rounded" style="font-size:16px">developer_board</span> Version 1.8.0
+      <span class="material-symbols-rounded" style="font-size:16px">developer_board</span>
+      <span data-i18n="chip.v18">Version 1.8.0</span>
     </button>
     <button type="button" class="chip" aria-pressed="false" onclick="toggleChip(this)">
-      <span class="material-symbols-rounded" style="font-size:16px">developer_board</span> Version 1.7.0
+      <span class="material-symbols-rounded" style="font-size:16px">developer_board</span>
+      <span data-i18n="chip.v17">Version 1.7.0</span>
     </button>
     <button type="button" class="chip" aria-pressed="false" onclick="toggleChip(this)">
-      <span class="material-symbols-rounded" style="font-size:16px">folder</span> Your .pc files
+      <span class="material-symbols-rounded" style="font-size:16px">folder</span>
+      <span data-i18n="chip.files">Your .pc files</span>
     </button>
     <button type="button" class="chip" aria-pressed="false" onclick="openDownload()">
-      <span class="material-symbols-rounded" style="font-size:16px">add</span> Create new
+      <span class="material-symbols-rounded" style="font-size:16px">add</span>
+      <span data-i18n="chip.create">Create new</span>
     </button>
   </div>
 </section>
 
 <section class="cta-section" id="cta">
   <div class="reveal reveal-scale">
-    <h2 class="cta-title">Ready to start building?</h2>
-    <p class="cta-sub">Download Grey PC Simulator for free</p>
+    <h2 class="cta-title" data-i18n="cta.title">Ready to start building?</h2>
+    <p class="cta-sub" data-i18n="cta.sub">Download Grey PC Simulator for free</p>
     <div class="hero-actions">
       <button type="button" onclick="openDownload()" class="btn btn-filled">
         <span class="material-symbols-rounded">download</span>
-        <span>Download for free</span>
+        <span data-i18n="hero.download">Download for free</span>
       </button>
-      <a href="https://discord.gg" target="_blank" rel="noopener" class="btn btn-tonal">
+      <button type="button" onclick="openSaveEditor()" class="btn btn-tonal">
+        <span class="material-symbols-rounded">edit_note</span>
+        <span data-i18n="cta.saveeditor">Save Editor</span>
+      </button>
+      <a href="https://discord.gg/5y3nUcWXzm" target="_blank" rel="noopener" class="btn btn-tonal">
         <span class="material-symbols-rounded">forum</span>
-        <span>Community</span>
+        <span data-i18n="cta.community">Community</span>
       </a>
     </div>
     <div class="platform-badges">
       <div class="badge">
-        <span class="material-symbols-rounded">window</span>
-        Windows 10 / 11
+        <span class="material-symbols-rounded">desktop_windows</span>
+        <span data-i18n="badge.win">Windows 10 / 11</span>
+      </div>
+      <div class="badge">
+        <span class="material-symbols-rounded">terminal</span>
+        <span data-i18n="badge.linux">Linux x64</span>
       </div>
       <div class="badge">
         <span class="material-symbols-rounded">devices</span>
-        64-bit
+        <span data-i18n="badge.bits">64-bit</span>
       </div>
       <div class="badge">
         <span class="material-symbols-rounded">memory</span>
-        4 GB RAM
+        <span data-i18n="badge.ram">4 GB RAM</span>
       </div>
     </div>
   </div>
 </section>
 
+<!-- Download modal -->
 <div class="dl-overlay" id="dlOverlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="dlModalTitle" onclick="handleOverlayClick(event)">
   <div class="dl-modal">
-    <h3 id="dlModalTitle">Choose your platform</h3>
-    <p>Grey PC Simulator is available for Windows and Linux</p>
+    <h3 id="dlModalTitle" data-i18n="dl.title">Choose your platform</h3>
+    <p data-i18n="dl.sub">Grey PC Simulator is available for Windows and Linux</p>
     <div class="dl-options">
 
       <a href="https://pixeldrain.com/u/3Qt3TwES" class="dl-option" target="_blank" rel="noopener">
         <div class="dl-option-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M3 5.557L10.357 4.5V11.5H3V5.557Z" fill="#00ADEF"/>
-            <path d="M11.143 4.393L21 3V11.5H11.143V4.393Z" fill="#00ADEF"/>
-            <path d="M3 12.5H10.357V19.5L3 18.443V12.5Z" fill="#00ADEF"/>
-            <path d="M11.143 12.5H21V21L11.143 19.607V12.5Z" fill="#00ADEF"/>
-          </svg>
+          <span class="material-symbols-rounded">desktop_windows</span>
         </div>
         <div class="dl-option-info">
           <strong>Windows</strong>
-          <span>Windows 10 / 11 · 64-bit · .exe</span>
+          <span data-i18n="dl.win.info">Windows 10 / 11 · 64-bit · .exe</span>
         </div>
         <span class="material-symbols-rounded" style="color:var(--md-primary)">open_in_new</span>
       </a>
 
       <a href="https://pixeldrain.com/u/7qbVep94" class="dl-option" target="_blank" rel="noopener">
         <div class="dl-option-icon">
-          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <path d="M12 2C9.5 2 8 4.5 8 7C8 8.6 8.5 9.9 9.3 10.9C8.5 11.3 7 12.3 7 14C7 14.8 7.3 15.3 7.3 15.3C6.7 15.6 6 16.3 6 17.5C6 19.4 7.5 20.5 9 20.9L9.5 21H14.5L15 20.9C16.5 20.5 18 19.4 18 17.5C18 16.3 17.3 15.6 16.7 15.3C16.7 15.3 17 14.8 17 14C17 12.3 15.5 11.3 14.7 10.9C15.5 9.9 16 8.6 16 7C16 4.5 14.5 2 12 2ZM12 4C13.4 4 14 5.3 14 7C14 8.1 13.6 9 12.9 9.6L12.3 10H11.7L11.1 9.6C10.4 9 10 8.1 10 7C10 5.3 10.6 4 12 4ZM10.5 12H13.5C14.3 12 15 12.7 15 13.5V14H9V13.5C9 12.7 9.7 12 10.5 12ZM8.5 16H15.5C15.8 16 16 16.2 16 16.5C16 17.3 15.3 18 14.5 18H9.5C8.7 18 8 17.3 8 16.5C8 16.2 8.2 16 8.5 16Z" fill="var(--md-on-surface)"/>
-          </svg>
+          <span class="material-symbols-rounded">terminal</span>
         </div>
         <div class="dl-option-info">
           <strong>Linux</strong>
-          <span>Ubuntu / Debian and others · x64</span>
+          <span data-i18n="dl.linux.info">Ubuntu / Debian and others · x64</span>
         </div>
         <span class="material-symbols-rounded" style="color:var(--md-primary)">open_in_new</span>
       </a>
 
     </div>
-    <button type="button" class="dl-close" onclick="closeDownload()">Cancel</button>
+    <button type="button" class="dl-close" onclick="closeModal()" data-i18n="dl.cancel">Cancel</button>
+  </div>
+</div>
+
+<!-- Save Editor modal -->
+<div class="dl-overlay" id="seOverlay" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="seModalTitle" onclick="handleOverlayClick(event)">
+  <div class="dl-modal">
+    <h3 id="seModalTitle" data-i18n="se.title">Save Editor</h3>
+    <p data-i18n="se.sub">Choose a version to download</p>
+    <div class="dl-options">
+
+      <a href="https://pixeldrain.com/u/Rm5tuKMR" class="dl-option" target="_blank" rel="noopener">
+        <div class="dl-option-icon">
+          <span class="material-symbols-rounded">bolt</span>
+        </div>
+        <div class="dl-option-info">
+          <strong>Rust</strong>
+          <span data-i18n="se.rust.info">Optimized · fastest performance · .exe</span>
+        </div>
+        <span class="material-symbols-rounded" style="color:var(--md-primary)">open_in_new</span>
+      </a>
+
+      <a href="https://pixeldrain.com/u/PVyuk8xg" class="dl-option" target="_blank" rel="noopener">
+        <div class="dl-option-icon">
+          <span class="material-symbols-rounded">code</span>
+        </div>
+        <div class="dl-option-info">
+          <strong>Python</strong>
+          <span data-i18n="se.python.info">Stable · cross-platform · .exe</span>
+        </div>
+        <span class="material-symbols-rounded" style="color:var(--md-primary)">open_in_new</span>
+      </a>
+
+    </div>
+    <button type="button" class="dl-close" onclick="closeModal()" data-i18n="dl.cancel">Cancel</button>
   </div>
 </div>
 
 <footer>
   <img src="logo.png" alt="Grey PC logo" class="footer-logo">
-  <p>© 2026 Grey PC Simulator · Made with ❤️ · <a href="https://github.com" target="_blank" rel="noopener">GitHub</a> · <a href="https://discord.gg" target="_blank" rel="noopener">Discord</a></p>
+  <p>
+    <span data-i18n="footer.copy">© 2026 Grey PC Simulator · Made with ❤️ ·</span>
+    <a href="https://discord.gg/5y3nUcWXzm" target="_blank" rel="noopener">Discord</a>
+  </p>
 </footer>
 
 <script>
 /* ================================================================== *
- * LIVING BACKGROUND - Mouse Parallax for Blobs
+ * i18n — translations
+ * ================================================================== */
+const translations = {
+  en: {
+    'nav.features': 'Features',
+    'nav.multiplayer': 'Multiplayer',
+    'nav.download': 'Download',
+
+    'hero.eyebrow': 'PC Simulator',
+    'hero.w1': 'Build',
+    'hero.w2': 'your',
+    'hero.w3': 'perfect',
+    'hero.w4': 'PC',
+    'hero.sub': 'Build, repair and upgrade virtual computers — solo or with a friend, in real time.',
+    'hero.download': 'Download for free',
+    'hero.learn': 'Learn more',
+
+    'features.label': 'Features',
+    'features.title': 'Everything a real master needs',
+    'f1.title': 'Realistic building',
+    'f1.desc': 'Install CPUs, graphics cards, RAM and drives into real motherboard slots — with proper compatibility checks.',
+    'f2.title': 'Repair &amp; diagnostics',
+    'f2.desc': 'Fix broken PCs, track down faults, replace parts — just like in a real repair shop.',
+    'f3.title': 'Daily Market',
+    'f3.desc': 'Buy rare components on the daily market and unlock exclusive items with bitcoins.',
+    'f5.title': 'Garage &amp; workshop',
+    'f5.desc': 'Several unique locations with different equipment and interiors. Unlock new ones as you progress.',
+    'f6.title': 'Save system',
+    'f6.desc': 'Save your progress to .pc files, share builds with friends and load ready-made configurations.',
+
+    'mp.label': 'Multiplayer',
+    'mp.title': 'Build together',
+    'mp.p1': '<strong>P2P connection over IP</strong> — no server, just you and your friend connecting directly.',
+    'mp.p2': '<strong>Shared building in real time</strong> — both players see every change instantly.',
+    'mp.p3': '<strong>The host picks the save</strong> — they load their file and are instantly inside, with no waiting in menus.',
+    'mp.p4': '<strong>Robot avatar</strong> — see exactly where the other player is in the world.',
+    'mp.cta': 'Try it with a friend',
+
+    'cfg.label': 'Configurations',
+    'cfg.title': 'Built-in examples and your own builds',
+    'cfg.desc': 'Start from a ready-made configuration or load one of your own .pc files — your save history lives right in the game.',
+
+    'chip.classic': 'Classic Build',
+    'chip.v18': 'Version 1.8.0',
+    'chip.v17': 'Version 1.7.0',
+    'chip.files': 'Your .pc files',
+    'chip.create': 'Create new',
+
+    'cta.title': 'Ready to start building?',
+    'cta.sub': 'Download Grey PC Simulator for free',
+    'cta.saveeditor': 'Save Editor',
+    'cta.community': 'Community',
+
+    'badge.win': 'Windows 10 / 11',
+    'badge.linux': 'Linux x64',
+    'badge.bits': '64-bit',
+    'badge.ram': '4 GB RAM',
+
+    'dl.title': 'Choose your platform',
+    'dl.sub': 'Grey PC Simulator is available for Windows and Linux',
+    'dl.win.info': 'Windows 10 / 11 · 64-bit · .exe',
+    'dl.linux.info': 'Ubuntu / Debian and others · x64',
+    'dl.cancel': 'Cancel',
+
+    'se.title': 'Save Editor',
+    'se.sub': 'Choose a version to download',
+    'se.rust.info': 'Optimized · fastest performance · .exe',
+    'se.python.info': 'Stable · cross-platform · .exe',
+
+    'footer.copy': '© 2026 Grey PC Simulator · Made with ❤️ ·'
+  },
+
+  ru: {
+    'nav.features': 'Возможности',
+    'nav.multiplayer': 'Мультиплеер',
+    'nav.download': 'Скачать',
+
+    'hero.eyebrow': 'Симулятор ПК',
+    'hero.w1': 'Собери',
+    'hero.w2': 'свой',
+    'hero.w3': 'идеальный',
+    'hero.w4': 'ПК',
+    'hero.sub': 'Собирай, ремонтируй и апгрейди виртуальные компьютеры — в одиночку или вдвоём, в реальном времени.',
+    'hero.download': 'Скачать бесплатно',
+    'hero.learn': 'Узнать больше',
+
+    'features.label': 'Возможности',
+    'features.title': 'Всё, что нужно настоящему мастеру',
+    'f1.title': 'Реалистичная сборка',
+    'f1.desc': 'Устанавливай процессоры, видеокарты, ОЗУ и накопители в настоящие слоты материнских плат — с проверкой совместимости.',
+    'f2.title': 'Ремонт и диагностика',
+    'f2.desc': 'Чини сломанные ПК, находи неисправности, заменяй детали — как в настоящем сервисе.',
+    'f3.title': 'Ежедневный рынок',
+    'f3.desc': 'Покупай редкие компоненты на ежедневном рынке и открывай эксклюзивные предметы за биткоины.',
+    'f5.title': 'Гараж и мастерская',
+    'f5.desc': 'Несколько уникальных локаций с разным оборудованием и интерьером. Открывай новые по мере прогресса.',
+    'f6.title': 'Система сохранений',
+    'f6.desc': 'Сохраняй прогресс в .pc-файлы, делись сборками с друзьями и загружай готовые конфигурации.',
+
+    'mp.label': 'Мультиплеер',
+    'mp.title': 'Собирай вместе',
+    'mp.p1': '<strong>P2P-подключение по IP</strong> — без сервера, только ты и друг напрямую.',
+    'mp.p2': '<strong>Общая сборка в реальном времени</strong> — оба игрока видят изменения мгновенно.',
+    'mp.p3': '<strong>Хост выбирает сейв</strong> — загружает свой файл и сразу оказывается внутри, без ожидания в меню.',
+    'mp.p4': '<strong>Аватар-робот</strong> — видишь, где находится второй игрок в мире.',
+    'mp.cta': 'Попробовать вдвоём',
+
+    'cfg.label': 'Конфигурации',
+    'cfg.title': 'Встроенные примеры и твои сборки',
+    'cfg.desc': 'Начни с готовой конфигурации или загрузи один из своих .pc-файлов — история сохранений прямо в игре.',
+
+    'chip.classic': 'Классическая сборка',
+    'chip.v18': 'Версия 1.8.0',
+    'chip.v17': 'Версия 1.7.0',
+    'chip.files': 'Твои .pc-файлы',
+    'chip.create': 'Создать новый',
+
+    'cta.title': 'Готов начать сборку?',
+    'cta.sub': 'Скачай Grey PC Simulator бесплатно',
+    'cta.saveeditor': 'Редактор сохранений',
+    'cta.community': 'Сообщество',
+
+    'badge.win': 'Windows 10 / 11',
+    'badge.linux': 'Linux x64',
+    'badge.bits': '64-бит',
+    'badge.ram': '4 ГБ ОЗУ',
+
+    'dl.title': 'Выбери платформу',
+    'dl.sub': 'Grey PC Simulator доступен для Windows и Linux',
+    'dl.win.info': 'Windows 10 / 11 · 64-bit · .exe',
+    'dl.linux.info': 'Ubuntu / Debian и другие · x64',
+    'dl.cancel': 'Отмена',
+
+    'se.title': 'Редактор сохранений',
+    'se.sub': 'Выбери версию для скачивания',
+    'se.rust.info': 'Оптимизированный · максимальная скорость · .exe',
+    'se.python.info': 'Стабильная · кроссплатформенный · .exe',
+
+    'footer.copy': '© 2026 Grey PC Simulator · Сделано с ❤️ ·'
+  }
+};
+
+const STORAGE_KEY = 'grey-pc-lang';
+
+function getSavedLang() {
+  try {
+    const v = localStorage.getItem(STORAGE_KEY);
+    if (v === 'en' || v === 'ru') return v;
+  } catch (e) {}
+  return null;
+}
+
+function saveLang(lang) {
+  try { localStorage.setItem(STORAGE_KEY, lang); } catch (e) {}
+}
+
+function detectLanguage() {
+  const saved = getSavedLang();
+  if (saved) return saved;
+
+  let browserLang = 'en';
+  try {
+    browserLang = (
+      (navigator.languages && navigator.languages[0]) ||
+      navigator.language ||
+      navigator.userLanguage ||
+      'en'
+    ).toLowerCase();
+  } catch (e) {}
+
+  const ruPrefixes = ['ru', 'be', 'uk', 'kk', 'ky', 'uz', 'tg', 'hy', 'az', 'mo'];
+  for (const p of ruPrefixes) {
+    if (browserLang === p || browserLang.startsWith(p + '-')) return 'ru';
+  }
+
+  return 'en';
+}
+
+function applyLanguage(lang) {
+  const dict = translations[lang] || translations.en;
+
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (dict[key] !== undefined) {
+      el.innerHTML = dict[key];
+    }
+  });
+
+  document.documentElement.lang = lang;
+
+  document.querySelectorAll('.lang-btn').forEach(btn => {
+    const isActive = btn.dataset.lang === lang;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+let currentLang = detectLanguage();
+applyLanguage(currentLang);
+
+document.querySelectorAll('.lang-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const lang = btn.dataset.lang;
+    if (lang === currentLang) return;
+    currentLang = lang;
+    saveLang(lang);
+    applyLanguage(lang);
+  });
+});
+
+/* ================================================================== *
+ * LIVING BACKGROUND
  * ================================================================== */
 let mouseX = 0, mouseY = 0;
 let blobX = 0, blobY = 0;
@@ -1407,7 +1460,6 @@ document.addEventListener('mousemove', (e) => {
   mouseY = (e.clientY / window.innerHeight - 0.5) * 2;
 });
 
-// Smooth blob parallax with requestAnimationFrame
 function animateBlobs() {
   blobX += (mouseX - blobX) * 0.05;
   blobY += (mouseY - blobY) * 0.05;
@@ -1422,19 +1474,16 @@ function animateBlobs() {
 animateBlobs();
 
 /* ================================================================== *
- * NAV scroll state
+ * Nav scroll state
  * ================================================================== */
 const nav = document.querySelector('nav');
-let lastScroll = 0;
 
 window.addEventListener('scroll', () => {
-  const y = window.scrollY;
-  if (y > 20) {
+  if (window.scrollY > 20) {
     nav.classList.add('scrolled');
   } else {
     nav.classList.remove('scrolled');
   }
-  lastScroll = y;
 }, { passive: true });
 
 /* ================================================================== *
@@ -1454,17 +1503,14 @@ function revealElement(el) {
   if (el.classList.contains('visible')) return;
   el.classList.add('visible');
 
-  // Clear stagger delay after reveal completes
   const delay = parseFloat(el.style.transitionDelay) || 0;
   window.setTimeout(() => { el.style.transitionDelay = ''; }, (delay + 1) * 1000);
 }
 
-// Stagger feature cards
 document.querySelectorAll('.feature-card').forEach((el, i) => {
   el.style.transitionDelay = (i * 0.08) + 's';
 });
 
-// Stagger chips
 document.querySelectorAll('.saves-chips .chip').forEach((el, i) => {
   el.style.transitionDelay = (i * 0.06) + 's';
 });
@@ -1481,70 +1527,11 @@ function initScrollReveal() {
 }
 
 /* ================================================================== *
- * 3D TILT on feature cards
- * ================================================================== */
-const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-if (!prefersReducedMotion) {
-  document.querySelectorAll('[data-tilt]').forEach(card => {
-    let rafId = null;
-    let targetRX = 0, targetRY = 0, targetMX = 50, targetMY = 50;
-    let currentRX = 0, currentRY = 0, currentMX = 50, currentMY = 50;
-
-    card.addEventListener('mousemove', (e) => {
-      const rect = card.getBoundingClientRect();
-      const x = (e.clientX - rect.left) / rect.width;
-      const y = (e.clientY - rect.top) / rect.height;
-
-      targetRX = (0.5 - y) * 8;
-      targetRY = (x - 0.5) * 8;
-      targetMX = x * 100;
-      targetMY = y * 100;
-
-      if (!rafId) rafId = requestAnimationFrame(updateTilt);
-    });
-
-    card.addEventListener('mouseleave', () => {
-      targetRX = 0;
-      targetRY = 0;
-      targetMX = 50;
-      targetMY = 50;
-      if (!rafId) rafId = requestAnimationFrame(updateTilt);
-    });
-
-    function updateTilt() {
-      // Smooth spring-like interpolation
-      currentRX += (targetRX - currentRX) * 0.12;
-      currentRY += (targetRY - currentRY) * 0.12;
-      currentMX += (targetMX - currentMX) * 0.12;
-      currentMY += (targetMY - currentMY) * 0.12;
-
-      card.style.transform = `perspective(1000px) rotateX(${currentRX}deg) rotateY(${currentRY}deg) translateY(-6px) scale(1.02)`;
-      card.style.setProperty('--mx', currentMX + '%');
-      card.style.setProperty('--my', currentMY + '%');
-
-      const stillMoving =
-        Math.abs(targetRX - currentRX) > 0.05 ||
-        Math.abs(targetRY - currentRY) > 0.05 ||
-        Math.abs(targetMX - currentMX) > 0.2 ||
-        Math.abs(targetMY - currentMY) > 0.2;
-
-      if (stillMoving) {
-        rafId = requestAnimationFrame(updateTilt);
-      } else {
-        rafId = null;
-        if (targetRX === 0 && targetRY === 0) {
-          card.style.transform = '';
-        }
-      }
-    }
-  });
-}
-
-/* ================================================================== *
- * HERO parallax on scroll
+ * HERO parallax
  * ================================================================== */
 const hero = document.querySelector('.hero');
+const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
 if (hero && !prefersReducedMotion) {
   let heroTicking = false;
   window.addEventListener('scroll', () => {
@@ -1564,21 +1551,19 @@ if (hero && !prefersReducedMotion) {
 }
 
 /* ================================================================== *
- * Download modal
+ * Unified modal system (Download + Save Editor)
  * ================================================================== */
 const dlOverlay = document.getElementById('dlOverlay');
+const seOverlay = document.getElementById('seOverlay');
 let previousActiveElement = null;
+let activeOverlay = null;
 
 function getScrollbarWidth() {
   return window.innerWidth - document.documentElement.clientWidth;
 }
 
-function isModalOpen() {
-  return dlOverlay.classList.contains('open');
-}
-
-function openDownload() {
-  if (isModalOpen()) return;
+function openModal(overlay) {
+  if (activeOverlay || !overlay) return;
 
   previousActiveElement = document.activeElement;
 
@@ -1591,38 +1576,43 @@ function openDownload() {
   }
 
   document.body.style.overflow = 'hidden';
-  dlOverlay.classList.add('open');
-  dlOverlay.setAttribute('aria-hidden', 'false');
+  overlay.classList.add('open');
+  overlay.setAttribute('aria-hidden', 'false');
+  activeOverlay = overlay;
 
   window.setTimeout(() => {
-    const firstOption = dlOverlay.querySelector('.dl-option');
+    const firstOption = overlay.querySelector('.dl-option');
     if (firstOption) firstOption.focus();
   }, 250);
 }
 
-function closeDownload() {
-  if (!isModalOpen()) return;
+function closeModal() {
+  if (!activeOverlay) return;
 
-  dlOverlay.classList.remove('open');
-  dlOverlay.setAttribute('aria-hidden', 'true');
+  activeOverlay.classList.remove('open');
+  activeOverlay.setAttribute('aria-hidden', 'true');
 
   document.body.style.overflow = '';
   document.body.style.paddingRight = '';
-
   if (nav) nav.style.paddingRight = '';
 
   if (previousActiveElement && typeof previousActiveElement.focus === 'function') {
     previousActiveElement.focus();
   }
   previousActiveElement = null;
+  activeOverlay = null;
 }
 
+function openDownload() { openModal(dlOverlay); }
+function openSaveEditor() { openModal(seOverlay); }
+
 function handleOverlayClick(e) {
-  if (e.target === dlOverlay) closeDownload();
+  if (e.target === dlOverlay || e.target === seOverlay) closeModal();
 }
 
 function trapFocus(e) {
-  const focusables = dlOverlay.querySelectorAll('a[href], button:not([disabled])');
+  if (!activeOverlay) return;
+  const focusables = activeOverlay.querySelectorAll('a[href], button:not([disabled])');
   if (!focusables.length) return;
 
   const first = focusables[0];
@@ -1638,9 +1628,9 @@ function trapFocus(e) {
 }
 
 document.addEventListener('keydown', e => {
-  if (!isModalOpen()) return;
+  if (!activeOverlay) return;
   if (e.key === 'Escape') {
-    closeDownload();
+    closeModal();
   } else if (e.key === 'Tab') {
     trapFocus(e);
   }
